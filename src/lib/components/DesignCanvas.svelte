@@ -34,9 +34,24 @@
     preserveAspectRatio="xMidYMid meet"
     class="font-svg"
   >
-    {#each transformedPaths as d}
-      <path {d} fill={$designState.textColor} />
-    {/each}
+    {#if $designState.strokeEnabled}
+      <g
+        fill={$designState.textColor}
+        stroke={$designState.strokeColor}
+        stroke-width={$designState.strokeWeight}
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        paint-order="stroke"
+      >
+        {#each transformedPaths as d}
+          <path {d} />
+        {/each}
+      </g>
+    {:else}
+      {#each transformedPaths as d}
+        <path {d} fill={$designState.textColor} />
+      {/each}
+    {/if}
   </svg>
 </div>
 

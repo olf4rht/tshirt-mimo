@@ -3,6 +3,7 @@
   import DesignCanvas from '$lib/components/DesignCanvas.svelte';
   import FontPicker from '$lib/components/FontPicker.svelte';
   import TransformSliders from '$lib/components/TransformSliders.svelte';
+  import StrokeControls from '$lib/components/StrokeControls.svelte';
 </script>
 
 <div class="app">
@@ -33,6 +34,7 @@
     <div class="toolbar-area">
       <FontPicker />
       <TransformSliders />
+      <StrokeControls />
     </div>
   </div>
 </div>
