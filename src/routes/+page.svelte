@@ -1,6 +1,7 @@
 <script lang="ts">
   import { activeTab } from '$lib/stores/designer';
   import DesignCanvas from '$lib/components/DesignCanvas.svelte';
+  import FontPicker from '$lib/components/FontPicker.svelte';
 </script>
 
 <div class="app">
@@ -29,7 +30,7 @@
       <p style="color: #666; text-align: center;">T-shirt preview</p>
     </div>
     <div class="toolbar-area">
-      <p style="color: white; text-align: center;">Toolbar</p>
+      <FontPicker />
     </div>
   </div>
 </div>
@@ -114,8 +115,10 @@
     background: #2a2a2a;
     border-radius: 20px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
     padding: 16px;
+    overflow-y: auto;
   }
 </style>
