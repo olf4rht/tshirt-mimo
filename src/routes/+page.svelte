@@ -4,6 +4,7 @@
   import FontPicker from '$lib/components/FontPicker.svelte';
   import TransformSliders from '$lib/components/TransformSliders.svelte';
   import StrokeControls from '$lib/components/StrokeControls.svelte';
+  import StrokeEffects from '$lib/components/StrokeEffects.svelte';
 </script>
 
 <div class="app">
@@ -35,6 +36,7 @@
       <FontPicker />
       <TransformSliders />
       <StrokeControls />
+      <StrokeEffects />
     </div>
   </div>
 </div>
