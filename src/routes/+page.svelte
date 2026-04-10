@@ -1,10 +1,13 @@
 <script lang="ts">
   import { activeTab } from '$lib/stores/designer';
   import DesignCanvas from '$lib/components/DesignCanvas.svelte';
+  import DrawCanvas from '$lib/components/DrawCanvas.svelte';
+  import DrawControls from '$lib/components/DrawControls.svelte';
   import FontPicker from '$lib/components/FontPicker.svelte';
   import TransformSliders from '$lib/components/TransformSliders.svelte';
   import StrokeControls from '$lib/components/StrokeControls.svelte';
   import StrokeEffects from '$lib/components/StrokeEffects.svelte';
+  import ColorControls from '$lib/components/ColorControls.svelte';
 </script>
 
 <div class="app">
@@ -23,7 +26,7 @@
       {#if $activeTab === 'design'}
         <DesignCanvas />
       {:else}
-        <p style="color: white; text-align: center;">Draw canvas placeholder</p>
+        <DrawCanvas />
       {/if}
     </div>
   </div>
@@ -33,10 +36,15 @@
       <p style="color: #666; text-align: center;">T-shirt preview</p>
     </div>
     <div class="toolbar-area">
-      <FontPicker />
-      <TransformSliders />
-      <StrokeControls />
-      <StrokeEffects />
+      {#if $activeTab === 'design'}
+        <FontPicker />
+        <TransformSliders />
+        <StrokeControls />
+        <StrokeEffects />
+        <ColorControls />
+      {:else}
+        <DrawControls />
+      {/if}
     </div>
   </div>
 </div>

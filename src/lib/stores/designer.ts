@@ -29,6 +29,7 @@ export const designState = writable({
 export const drawState = writable({
   brushSize: 4,
   brushColor: '#ffffff',
+  clearTrigger: 0,
 });
 
 export interface Stamp {
