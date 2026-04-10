@@ -2,6 +2,7 @@
   import { activeTab } from '$lib/stores/designer';
   import DesignCanvas from '$lib/components/DesignCanvas.svelte';
   import FontPicker from '$lib/components/FontPicker.svelte';
+  import TransformSliders from '$lib/components/TransformSliders.svelte';
 </script>
 
 <div class="app">
@@ -31,6 +32,7 @@
     </div>
     <div class="toolbar-area">
       <FontPicker />
+      <TransformSliders />
     </div>
   </div>
 </div>

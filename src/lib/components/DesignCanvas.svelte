@@ -1,6 +1,7 @@
 <script lang="ts">
   import { designState } from '$lib/stores/designer';
   import { FONTS } from '$lib/data/fonts';
+  import { applyTransforms } from '$lib/utils/svg-transforms';
 
   let paths: string[] = $state([]);
   let viewBox: string = $state('0 0 100 20');
@@ -20,6 +21,10 @@
         paths = Array.from(pathEls).map((p) => p.getAttribute('d') ?? '');
       });
   });
+
+  let transformedPaths = $derived(
+    applyTransforms(paths, $designState.bend, $designState.inflate, $designState.stretch)
+  );
 </script>
 
 <div class="design-canvas">
@@ -29,7 +34,7 @@
     preserveAspectRatio="xMidYMid meet"
     class="font-svg"
   >
-    {#each paths as d}
+    {#each transformedPaths as d}
       <path {d} fill={$designState.textColor} />
     {/each}
   </svg>
