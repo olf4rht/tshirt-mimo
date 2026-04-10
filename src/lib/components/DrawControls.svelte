@@ -16,8 +16,11 @@
 </script>
 
 <div class="draw-controls">
-  <label class="control-row">
-    <span class="label">Brush Size</span>
+  <div class="slider-row">
+    <label>
+      <span class="label-text">Brush Size</span>
+      <span class="label-value">{$drawState.brushSize}px</span>
+    </label>
     <input
       type="range"
       min="1"
@@ -25,17 +28,16 @@
       value={$drawState.brushSize}
       oninput={handleSizeChange}
     />
-    <span class="value">{$drawState.brushSize}px</span>
-  </label>
+  </div>
 
-  <label class="control-row">
-    <span class="label">Brush Color</span>
+  <div class="color-row">
+    <span class="label-text">Brush Color</span>
     <input
       type="color"
       value={$drawState.brushColor}
       oninput={handleColorChange}
     />
-  </label>
+  </div>
 
   <button class="clear-btn" onclick={clearCanvas}>
     Clear Canvas
@@ -50,38 +52,85 @@
     gap: 12px;
   }
 
-  .control-row {
+  .slider-row {
     display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  label {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+  }
+
+  .label-text {
     color: #ccc;
     font-size: 13px;
+    font-weight: 500;
   }
 
-  .label {
-    min-width: 80px;
-    color: #999;
-  }
-
-  .value {
-    min-width: 40px;
-    text-align: right;
-    color: #ccc;
+  .label-value {
+    color: #888;
     font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .color-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   input[type='range'] {
-    flex: 1;
-    accent-color: #fff;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #444;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    cursor: pointer;
   }
 
   input[type='color'] {
-    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 2px solid #555;
+    border-radius: 50%;
     background: none;
-    width: 32px;
-    height: 32px;
-    padding: 0;
     cursor: pointer;
+    padding: 0;
+  }
+
+  input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 2px;
+  }
+
+  input[type='color']::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
   }
 
   .clear-btn {

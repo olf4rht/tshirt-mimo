@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { activeTab } from '$lib/stores/designer';
+  import { activeTab, designState } from '$lib/stores/designer';
   import DesignCanvas from '$lib/components/DesignCanvas.svelte';
   import DrawCanvas from '$lib/components/DrawCanvas.svelte';
   import DrawControls from '$lib/components/DrawControls.svelte';
@@ -11,6 +11,13 @@
   import StampManager from '$lib/components/StampManager.svelte';
   import TshirtPreview from '$lib/components/TshirtPreview.svelte';
   import ExportButton from '$lib/components/ExportButton.svelte';
+
+  const shirtPresets = [
+    { label: 'Red', value: '#cc0000' },
+    { label: 'Black', value: '#1a1a1a' },
+    { label: 'Grey', value: '#808080' },
+    { label: 'White', value: '#f0f0f0' },
+  ];
 </script>
 
 <div class="app">
@@ -36,7 +43,25 @@
 
   <div class="panel-right">
     <div class="preview-area">
-      <TshirtPreview />
+      <div class="shirt-color-dots">
+        {#each shirtPresets as preset}
+          <button
+            class="color-dot"
+            class:active={$designState.shirtColor === preset.value}
+            style="background-color: {preset.value};"
+            title={preset.label}
+            onclick={() => { $designState.shirtColor = preset.value; }}
+          ></button>
+        {/each}
+      </div>
+      <div class="preview-content">
+        <TshirtPreview />
+      </div>
+      <button class="like-btn" title="Like this design">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+        </svg>
+      </button>
     </div>
     <div class="toolbar-area">
       {#if $activeTab === 'design'}
@@ -57,7 +82,7 @@
 <style>
   :global(body) {
     margin: 0;
-    background: #111;
+    background: #f5f5f5;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
@@ -77,6 +102,7 @@
     border-radius: 20px;
     padding: 16px;
     gap: 12px;
+    min-height: 0;
   }
 
   .tab-toggle {
@@ -92,12 +118,12 @@
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 8px 20px;
+    padding: 8px 24px;
     border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     background: transparent;
-    color: #888;
+    color: #666;
     transition: all 0.2s ease;
   }
 
@@ -112,32 +138,114 @@
     align-items: center;
     justify-content: center;
     border-radius: 12px;
+    min-height: 0;
   }
 
   .panel-right {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-height: 0;
   }
 
   .preview-area {
     flex: 1;
-    background: #e8e8e8;
+    background: #eaeaea;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    padding: 12px;
+    min-height: 0;
+  }
+
+  .preview-content {
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .shirt-color-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .color-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .color-dot:hover {
+    border-color: #aaa;
+  }
+
+  .color-dot.active {
+    border-color: #333;
+    box-shadow: 0 0 0 2.5px #4a9eff;
+  }
+
+  .like-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: all 0.15s ease;
+    z-index: 2;
+  }
+
+  .like-btn:hover {
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
   .toolbar-area {
     flex: 1;
-    background: #2a2a2a;
+    background: #222;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 16px;
+    padding: 20px;
+    gap: 16px;
     overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+  }
+
+  .toolbar-area::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .toolbar-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .toolbar-area::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
   }
 </style>

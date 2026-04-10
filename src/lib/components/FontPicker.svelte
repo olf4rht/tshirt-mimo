@@ -28,11 +28,11 @@
   }
 
   .label {
-    color: #999;
-    font-size: 12px;
+    color: #888;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 1px;
   }
 
   .thumbnails {
@@ -52,7 +52,7 @@
     flex-shrink: 0;
     width: 60px;
     height: 40px;
-    background: #1a1a1a;
+    background: #333;
     border-radius: 8px;
     padding: 4px;
     cursor: pointer;

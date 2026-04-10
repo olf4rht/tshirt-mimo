@@ -103,11 +103,11 @@
   }
 
   .section-title {
-    color: #999;
+    color: #888;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
   }
 
   .toggle-row {
