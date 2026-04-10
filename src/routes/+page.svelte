@@ -1,5 +1,6 @@
 <script lang="ts">
   import { activeTab } from '$lib/stores/designer';
+  import DesignCanvas from '$lib/components/DesignCanvas.svelte';
 </script>
 
 <div class="app">
@@ -15,7 +16,11 @@
       >Design</button>
     </div>
     <div class="canvas-area">
-      <p style="color: white; text-align: center;">Canvas placeholder</p>
+      {#if $activeTab === 'design'}
+        <DesignCanvas />
+      {:else}
+        <p style="color: white; text-align: center;">Draw canvas placeholder</p>
+      {/if}
     </div>
   </div>
 
