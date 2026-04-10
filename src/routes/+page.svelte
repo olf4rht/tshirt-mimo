@@ -8,7 +8,9 @@
   import StrokeControls from '$lib/components/StrokeControls.svelte';
   import StrokeEffects from '$lib/components/StrokeEffects.svelte';
   import ColorControls from '$lib/components/ColorControls.svelte';
+  import StampManager from '$lib/components/StampManager.svelte';
   import TshirtPreview from '$lib/components/TshirtPreview.svelte';
+  import ExportButton from '$lib/components/ExportButton.svelte';
 </script>
 
 <div class="app">
@@ -46,6 +48,8 @@
       {:else}
         <DrawControls />
       {/if}
+      <StampManager />
+      <ExportButton />
     </div>
   </div>
 </div>
