@@ -8,6 +8,7 @@
   import StrokeControls from '$lib/components/StrokeControls.svelte';
   import StrokeEffects from '$lib/components/StrokeEffects.svelte';
   import ColorControls from '$lib/components/ColorControls.svelte';
+  import TshirtPreview from '$lib/components/TshirtPreview.svelte';
 </script>
 
 <div class="app">
@@ -33,7 +34,7 @@
 
   <div class="panel-right">
     <div class="preview-area">
-      <p style="color: #666; text-align: center;">T-shirt preview</p>
+      <TshirtPreview />
     </div>
     <div class="toolbar-area">
       {#if $activeTab === 'design'}
