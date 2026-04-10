@@ -50,6 +50,22 @@
       }}
     />
   </div>
+
+  <div class="slider-row">
+    <label>
+      <span class="label-text">Rough Edges</span>
+      <span class="label-value">{$designState.roughEdges}</span>
+    </label>
+    <input
+      type="range"
+      min="0"
+      max="100"
+      value={$designState.roughEdges}
+      oninput={(e: Event) => {
+        $designState.roughEdges = Number((e.target as HTMLInputElement).value);
+      }}
+    />
+  </div>
 </div>
 
 <style>

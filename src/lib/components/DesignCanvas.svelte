@@ -82,27 +82,44 @@
           <stop offset="100%" stop-color={$designState.strokeGradientEnd} />
         </linearGradient>
       {/if}
+
+      <filter id="text-distress" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence
+          type="turbulence"
+          baseFrequency="0.04"
+          numOctaves="4"
+          seed="2"
+          result="noise"
+        />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="noise"
+          scale={$designState.roughEdges > 0 ? $designState.roughEdges * 0.5 : 0}
+        />
+      </filter>
     </defs>
 
-    {#if $designState.strokeEnabled}
-      <g
-        fill={$designState.textColor}
-        stroke={strokeColorValue}
-        stroke-width={$designState.strokeWeight}
-        stroke-linejoin="round"
-        stroke-linecap="round"
-        paint-order="stroke"
-        filter={hasStrokeEffects ? 'url(#stroke-effects)' : undefined}
-      >
+    <g filter={$designState.roughEdges > 0 ? 'url(#text-distress)' : undefined}>
+      {#if $designState.strokeEnabled}
+        <g
+          fill={$designState.textColor}
+          stroke={strokeColorValue}
+          stroke-width={$designState.strokeWeight}
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          paint-order="stroke"
+          filter={hasStrokeEffects ? 'url(#stroke-effects)' : undefined}
+        >
+          {#each transformedPaths as d}
+            <path {d} />
+          {/each}
+        </g>
+      {:else}
         {#each transformedPaths as d}
-          <path {d} />
+          <path {d} fill={$designState.textColor} />
         {/each}
-      </g>
-    {:else}
-      {#each transformedPaths as d}
-        <path {d} fill={$designState.textColor} />
-      {/each}
-    {/if}
+      {/if}
+    </g>
   </svg>
 </div>
 
