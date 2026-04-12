@@ -1,7 +1,7 @@
 <script lang="ts">
   import { designState } from '$lib/stores/designer';
   import { FONTS } from '$lib/data/fonts';
-  import { applyTransforms } from '$lib/utils/svg-transforms';
+  import { applyTransforms, parsePath, getBBox, toAbsolute } from '$lib/utils/svg-transforms';
 
   interface Props {
     filterId?: string;
@@ -35,6 +35,26 @@
     applyTransforms(paths, $designState.bend, $designState.inflate, $designState.stretch)
   );
 
+  let computedViewBox = $derived.by(() => {
+    if (transformedPaths.length === 0) return viewBox;
+    // Compute bounding box across all transformed paths
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const d of transformedPaths) {
+      const cmds = toAbsolute(parsePath(d));
+      const bbox = getBBox(cmds);
+      if (bbox.minX < minX) minX = bbox.minX;
+      if (bbox.minY < minY) minY = bbox.minY;
+      if (bbox.maxX > maxX) maxX = bbox.maxX;
+      if (bbox.maxY > maxY) maxY = bbox.maxY;
+    }
+    if (!isFinite(minX)) return viewBox;
+    // Add padding (10% of dimensions)
+    const w = maxX - minX;
+    const h = maxY - minY;
+    const pad = Math.max(w, h) * 0.1;
+    return `${minX - pad} ${minY - pad} ${w + pad * 2} ${h + pad * 2}`;
+  });
+
   let hasStrokeEffects = $derived(
     $designState.strokeBlur > 0 ||
     $designState.strokeRoughEdges > 0 ||
@@ -47,10 +67,11 @@
 </script>
 
 <svg
-  {viewBox}
+  viewBox={computedViewBox}
   xmlns="http://www.w3.org/2000/svg"
   preserveAspectRatio="xMidYMid meet"
   class="font-svg"
+  overflow="visible"
 >
   <defs>
     <filter id="{prefix}stroke-effects" x="-50%" y="-50%" width="200%" height="200%">
