@@ -81,7 +81,9 @@
 
         <!-- Position selector -->
         <div class="control-row">
-          <span class="control-label">Position</span>
+          <div class="label-col">
+            <span class="control-label">Position</span>
+          </div>
           <div class="position-grid">
             {#each positionGrid as pos, i}
               <button
@@ -99,7 +101,9 @@
 
         <!-- Size selector -->
         <div class="control-row">
-          <span class="control-label">Size</span>
+          <div class="label-col-size">
+            <span class="control-label">Size</span>
+          </div>
           <div class="pill-group">
             {#each sizeOptions as opt}
               <button
@@ -279,8 +283,17 @@
   .control-row {
     display: flex;
     align-items: center;
-    gap: 12px;
     width: 100%;
+  }
+
+  .label-col {
+    width: 118px;
+    flex-shrink: 0;
+  }
+
+  .label-col-size {
+    width: 74px;
+    flex-shrink: 0;
   }
 
   .control-label {
@@ -341,7 +354,7 @@
 
   .pill-btn {
     padding: 0 5px;
-    border-radius: 9px;
+    border-radius: 26px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;

@@ -81,7 +81,7 @@
     height: 18px;
     background: #EDEDEB;
     border: none;
-    border-radius: 9px;
+    border-radius: 26px;
     padding: 0 8px;
     cursor: pointer;
     outline: none;

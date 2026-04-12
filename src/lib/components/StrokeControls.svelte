@@ -155,7 +155,7 @@
 
   .pill-btn {
     padding: 0 5px;
-    border-radius: 9px;
+    border-radius: 26px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;

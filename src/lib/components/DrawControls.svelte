@@ -145,7 +145,7 @@
     padding: 0 10px;
     height: 18px;
     border: 1px solid #CECDCC;
-    border-radius: 9px;
+    border-radius: 26px;
     background: transparent;
     color: #CECDCC;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
