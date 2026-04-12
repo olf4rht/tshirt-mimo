@@ -43,41 +43,47 @@
             $designState.strokeColor = (e.target as HTMLInputElement).value;
           }}
         />
-        <input
-          type="range"
-          min="0"
-          max="20"
-          step="0.5"
-          value={$designState.strokeWeight}
-          oninput={(e: Event) => {
-            $designState.strokeWeight = Number((e.target as HTMLInputElement).value);
-          }}
-        />
+        <div class="stroke-slider-wrapper">
+          <input
+            type="range"
+            min="0"
+            max="20"
+            step="0.5"
+            value={$designState.strokeWeight}
+            oninput={(e: Event) => {
+              $designState.strokeWeight = Number((e.target as HTMLInputElement).value);
+            }}
+          />
+        </div>
       </div>
     {:else if strokeTab === 'pixelized'}
       <div class="slider-row">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={$designState.strokePixelized}
-          oninput={(e: Event) => {
-            $designState.strokePixelized = Number((e.target as HTMLInputElement).value);
-          }}
-        />
+        <div class="stroke-slider-wrapper full">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={$designState.strokePixelized}
+            oninput={(e: Event) => {
+              $designState.strokePixelized = Number((e.target as HTMLInputElement).value);
+            }}
+          />
+        </div>
       </div>
     {:else if strokeTab === 'blur'}
       <div class="slider-row">
-        <input
-          type="range"
-          min="0"
-          max="20"
-          step="0.5"
-          value={$designState.strokeBlur}
-          oninput={(e: Event) => {
-            $designState.strokeBlur = Number((e.target as HTMLInputElement).value);
-          }}
-        />
+        <div class="stroke-slider-wrapper full">
+          <input
+            type="range"
+            min="0"
+            max="20"
+            step="0.5"
+            value={$designState.strokeBlur}
+            oninput={(e: Event) => {
+              $designState.strokeBlur = Number((e.target as HTMLInputElement).value);
+            }}
+          />
+        </div>
       </div>
     {:else if strokeTab === 'gradient'}
       <div class="gradient-row">
@@ -123,7 +129,7 @@
   .stroke-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 28px;
   }
 
   .control-label {
@@ -132,15 +138,13 @@
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 0 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
-    line-height: 12px;
+    line-height: 17px;
     height: 17px;
-    display: flex;
-    align-items: center;
   }
 
   .stroke-tabs {
@@ -151,16 +155,14 @@
 
   .pill-btn {
     padding: 0 5px;
-    border-radius: 26px;
+    border-radius: 9px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: -0.43px;
-    line-height: 22px;
+    line-height: 18px;
     height: 18px;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;
@@ -189,7 +191,9 @@
   .slider-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
+    width: 100%;
   }
 
   .gradient-row {
@@ -198,12 +202,21 @@
     gap: 10px;
   }
 
+  .stroke-slider-wrapper {
+    max-width: 190px;
+    flex: 1;
+  }
+
+  .stroke-slider-wrapper.full {
+    max-width: 100%;
+  }
+
   .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
-    border: none;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;
     cursor: pointer;
@@ -223,10 +236,11 @@
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
-    flex: 1;
-    height: 2px;
-    background: #D4D4D4;
-    border-radius: 1px;
+    width: 100%;
+    height: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #CECDCC;
+    border-radius: 6px;
     outline: none;
     cursor: pointer;
   }
@@ -234,27 +248,35 @@
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: #666;
+    background: #fff;
+    border: 1px solid #CECDCC;
     cursor: pointer;
   }
 
   input[type='range']::-moz-range-thumb {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: #666;
-    border: none;
+    background: #fff;
+    border: 1px solid #CECDCC;
     cursor: pointer;
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #CECDCC;
+    border-radius: 6px;
   }
 
   .toggle {
     position: relative;
     display: inline-block;
-    width: 36px;
-    height: 20px;
+    width: 30px;
+    height: 16px;
   }
 
   .toggle-small {

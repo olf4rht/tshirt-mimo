@@ -201,37 +201,36 @@
   .toolbox {
     background: #EBEAE7;
     border-radius: 20px;
-    padding: 12px 16px 16px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
     min-height: 0;
-    height: 485px;
     overflow: hidden;
+    position: relative;
   }
 
   .toolbox-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0;
+    padding: 13px 13px 0 11px;
   }
 
   .tab-bar {
     display: flex;
-    gap: 0;
+    gap: 55px;
+    align-items: center;
   }
 
   .tab-btn {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 0;
+    background: transparent;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    background: transparent;
     color: #000;
     letter-spacing: -0.43px;
     line-height: 12px;
@@ -249,13 +248,14 @@
   }
 
   .inner-panel {
+    margin: 12px 16px 16px;
     flex: 1;
     background: #F4F4F4;
     border-radius: 30px;
-    padding: 18px;
+    padding: 22px 18px 18px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
     overflow-y: auto;
     min-height: 0;
     scrollbar-width: thin;
@@ -289,32 +289,31 @@
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 0 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
-    line-height: 12px;
+    line-height: 17px;
     height: 17px;
-    display: flex;
-    align-items: center;
   }
 
   /* Position 3x3 grid */
   .position-grid {
     display: grid;
     grid-template-columns: repeat(3, auto);
-    gap: 12px 24px;
+    gap: 14px 26px;
     background: #FDFDFD;
     border-radius: 7px;
     padding: 11px 13px 11px 12px;
+    width: 79px;
   }
 
   .pos-dot {
-    width: 4px;
-    height: 4px;
+    width: 2px;
+    height: 2px;
     border-radius: 50%;
-    background: #D9D9D9;
+    background: #B0B0B0;
     border: none;
     cursor: pointer;
     padding: 0;
@@ -322,14 +321,15 @@
   }
 
   .pos-dot.pos-active {
-    background: #3B82F6;
-    width: 6px;
-    height: 6px;
-    margin: -1px;
+    background: #7DC4F8;
+    width: 3px;
+    height: 3px;
+    margin: -0.5px;
+    box-shadow: 0 0 0 1px #7DC4F8;
   }
 
   .pos-dot:hover:not(.pos-active) {
-    background: #999;
+    background: #666;
   }
 
   /* Pill group (Size) */
@@ -341,16 +341,14 @@
 
   .pill-btn {
     padding: 0 5px;
-    border-radius: 26px;
+    border-radius: 9px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: -0.43px;
-    line-height: 22px;
+    line-height: 18px;
     height: 18px;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;

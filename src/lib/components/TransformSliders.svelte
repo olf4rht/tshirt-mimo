@@ -5,54 +5,62 @@
 <div class="transform-sliders">
   <div class="slider-row">
     <span class="control-label">Bend</span>
-    <input
-      type="range"
-      min="-100"
-      max="100"
-      value={$designState.bend}
-      oninput={(e: Event) => {
-        $designState.bend = Number((e.target as HTMLInputElement).value);
-      }}
-    />
+    <div class="slider-track-wrapper">
+      <input
+        type="range"
+        min="-100"
+        max="100"
+        value={$designState.bend}
+        oninput={(e: Event) => {
+          $designState.bend = Number((e.target as HTMLInputElement).value);
+        }}
+      />
+    </div>
   </div>
 
   <div class="slider-row">
     <span class="control-label">Inflate</span>
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={$designState.inflate}
-      oninput={(e: Event) => {
-        $designState.inflate = Number((e.target as HTMLInputElement).value);
-      }}
-    />
+    <div class="slider-track-wrapper">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={$designState.inflate}
+        oninput={(e: Event) => {
+          $designState.inflate = Number((e.target as HTMLInputElement).value);
+        }}
+      />
+    </div>
   </div>
 
   <div class="slider-row">
     <span class="control-label">Rough Edges</span>
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={$designState.roughEdges}
-      oninput={(e: Event) => {
-        $designState.roughEdges = Number((e.target as HTMLInputElement).value);
-      }}
-    />
+    <div class="slider-track-wrapper">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={$designState.roughEdges}
+        oninput={(e: Event) => {
+          $designState.roughEdges = Number((e.target as HTMLInputElement).value);
+        }}
+      />
+    </div>
   </div>
 
   <div class="slider-row">
     <span class="control-label">Stretch</span>
-    <input
-      type="range"
-      min="0"
-      max="100"
-      value={$designState.stretch}
-      oninput={(e: Event) => {
-        $designState.stretch = Number((e.target as HTMLInputElement).value);
-      }}
-    />
+    <div class="slider-track-wrapper">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={$designState.stretch}
+        oninput={(e: Event) => {
+          $designState.stretch = Number((e.target as HTMLInputElement).value);
+        }}
+      />
+    </div>
   </div>
 </div>
 
@@ -61,7 +69,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 16px;
   }
 
   .slider-row {
@@ -76,24 +84,29 @@
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 0 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
-    line-height: 12px;
+    line-height: 17px;
     height: 17px;
+  }
+
+  .slider-track-wrapper {
+    flex: 1;
     display: flex;
     align-items: center;
+    max-width: 190px;
   }
 
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
-    flex: 1;
-    height: 2px;
-    background: #D4D4D4;
-    border-radius: 1px;
+    width: 100%;
+    height: 11px;
+    background: #fff;
+    border-radius: 5.5px;
     outline: none;
     cursor: pointer;
   }
@@ -101,19 +114,25 @@
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 6px;
-    height: 6px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
-    background: #666;
+    background: #B0B0B0;
     cursor: pointer;
   }
 
   input[type='range']::-moz-range-thumb {
-    width: 6px;
-    height: 6px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
-    background: #666;
+    background: #B0B0B0;
     border: none;
     cursor: pointer;
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 11px;
+    background: #fff;
+    border-radius: 5.5px;
   }
 </style>

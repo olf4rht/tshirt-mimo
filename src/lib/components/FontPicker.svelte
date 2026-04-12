@@ -20,6 +20,7 @@
 
     {#if dropdownOpen}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div class="dropdown-backdrop" onclick={() => dropdownOpen = false}></div>
       <div class="dropdown-menu">
         {#each FONTS as font, i}
@@ -57,15 +58,13 @@
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 0 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
-    line-height: 12px;
+    line-height: 17px;
     height: 17px;
-    display: flex;
-    align-items: center;
   }
 
   .dropdown-wrapper {
@@ -79,10 +78,11 @@
     align-items: center;
     gap: 6px;
     width: 100%;
+    height: 18px;
     background: #EDEDEB;
     border: none;
-    border-radius: 26px;
-    padding: 5px 10px;
+    border-radius: 9px;
+    padding: 0 8px;
     cursor: pointer;
     outline: none;
   }
@@ -156,9 +156,9 @@
   .color-dot {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
-    border: none;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;
     cursor: pointer;
