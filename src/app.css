@@ -17,6 +17,14 @@
 
 @font-face {
   font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYMEDIUM.OTF') format('opentype');
+  font-weight: 590;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
   src: url('/fonts/sf-pro-display/SFPRODISPLAYBOLD.OTF') format('opentype');
   font-weight: 700;
   font-style: normal;
@@ -36,6 +44,14 @@
   src: url('/fonts/sf-pro-display/SFPRODISPLAYHEAVYITALIC.OTF') format('opentype');
   font-weight: 860;
   font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYHEAVYITALIC.OTF') format('opentype');
+  font-weight: 860;
+  font-style: normal;
   font-display: swap;
 }
 

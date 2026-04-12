@@ -158,7 +158,7 @@
     border-radius: 9px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 590;
     text-transform: uppercase;
     letter-spacing: -0.43px;
     line-height: 18px;

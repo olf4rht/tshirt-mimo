@@ -18,13 +18,15 @@
 <div class="draw-controls">
   <div class="slider-row">
     <span class="control-label">Brush Size</span>
-    <input
-      type="range"
-      min="1"
-      max="50"
-      value={$drawState.brushSize}
-      oninput={handleSizeChange}
-    />
+    <div class="slider-track-wrapper">
+      <input
+        type="range"
+        min="1"
+        max="50"
+        value={$drawState.brushSize}
+        oninput={handleSizeChange}
+      />
+    </div>
   </div>
 
   <div class="color-row">
@@ -59,13 +61,21 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 0 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
-    min-width: 80px;
+    letter-spacing: -0.43px;
+    line-height: 17px;
+    height: 17px;
+  }
+
+  .slider-track-wrapper {
+    flex: 1;
+    max-width: 190px;
   }
 
   .color-row {
@@ -77,9 +87,9 @@
   .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
-    border: none;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;
     cursor: pointer;
@@ -98,10 +108,10 @@
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
-    flex: 1;
-    height: 2px;
-    background: #D4D4D4;
-    border-radius: 1px;
+    width: 100%;
+    height: 11px;
+    background: #fff;
+    border-radius: 5.5px;
     outline: none;
     cursor: pointer;
   }
@@ -109,37 +119,49 @@
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 6px;
-    height: 6px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
-    background: #666;
+    background: #B0B0B0;
     cursor: pointer;
   }
 
   input[type='range']::-moz-range-thumb {
-    width: 6px;
-    height: 6px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
-    background: #666;
+    background: #B0B0B0;
     border: none;
     cursor: pointer;
   }
 
+  input[type='range']::-moz-range-track {
+    height: 11px;
+    background: #fff;
+    border-radius: 5.5px;
+  }
+
   .clear-btn {
-    padding: 8px 16px;
+    padding: 0 10px;
+    height: 18px;
     border: 1px solid #CECDCC;
-    border-radius: 26px;
+    border-radius: 9px;
     background: transparent;
-    color: #B0B0B0;
-    font-size: 12px;
-    font-weight: 600;
+    color: #CECDCC;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 590;
+    letter-spacing: -0.43px;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s;
     align-self: flex-start;
+    opacity: 0.6;
   }
 
   .clear-btn:hover {
     background: rgba(255,255,255,0.85);
-    color: #666;
+    color: #B0B0B0;
+    opacity: 1;
   }
 </style>

@@ -90,7 +90,7 @@
   .dropdown-text {
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 590;
     color: #B0B0B0;
     text-transform: uppercase;
     letter-spacing: -0.43px;
@@ -135,7 +135,7 @@
     padding: 6px 10px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 590;
     color: #666;
     text-transform: uppercase;
     letter-spacing: -0.43px;
