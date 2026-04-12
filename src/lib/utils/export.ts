@@ -1,9 +1,16 @@
 import type { Stamp } from '$lib/stores/designer';
 
-const SHIRT_PATH =
-  'M 100,0 L 0,80 L 50,130 L 80,110 L 80,460 C 80,475 90,480 100,480 L 300,480 C 310,480 320,475 320,460 L 320,110 L 350,130 L 400,80 L 300,0 C 290,30 260,50 200,50 C 140,50 110,30 100,0 Z';
+const SHIRT_MOCKUPS: Record<string, string> = {
+  dark: '/mockups/black.png',
+  light: '/mockups/white.png',
+};
 
-const SHIRT_VIEWBOX = '0 0 400 480';
+function getShirtMockupUrl(shirtColor: string): string {
+  if (shirtColor === '#f0f0f0' || shirtColor === '#ffffff') {
+    return SHIRT_MOCKUPS.light;
+  }
+  return SHIRT_MOCKUPS.dark;
+}
 
 export interface ExportOptions {
   shirtColor: string;
@@ -34,26 +41,15 @@ async function drawShirt(
   color: string,
   size: number
 ): Promise<void> {
-  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${SHIRT_VIEWBOX}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet">
-    <path d="${SHIRT_PATH}" fill="${color}" />
-  </svg>`;
-  const url = svgToDataUrl(svgString);
-  try {
-    const img = await loadImage(url);
-    // Center the shirt in the canvas
-    // The viewBox is 400x480, so when fit into 1080x1080 with "meet",
-    // the rendered area is letterboxed. We replicate that centering.
-    const vbW = 400;
-    const vbH = 480;
-    const scale = Math.min(size / vbW, size / vbH);
-    const w = vbW * scale;
-    const h = vbH * scale;
-    const x = (size - w) / 2;
-    const y = (size - h) / 2;
-    ctx.drawImage(img, x, y, w, h);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+  const mockupUrl = getShirtMockupUrl(color);
+  const img = await loadImage(mockupUrl);
+  // Fit the mockup image centered in the canvas (80% like the preview)
+  const scale = Math.min(size / img.naturalWidth, size / img.naturalHeight) * 0.8;
+  const w = img.naturalWidth * scale;
+  const h = img.naturalHeight * scale;
+  const x = (size - w) / 2;
+  const y = (size - h) / 2;
+  ctx.drawImage(img, x, y, w, h);
 }
 
 async function drawSvgOnCanvas(

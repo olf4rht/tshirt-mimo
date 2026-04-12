@@ -181,17 +181,11 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="tshirt-preview" bind:this={container} onclick={onBackgroundClick}>
-  <svg
-    class="shirt-svg"
-    viewBox="0 0 400 480"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <path
-      d="M 100,0 L 0,80 L 50,130 L 80,110 L 80,460 C 80,475 90,480 100,480 L 300,480 C 310,480 320,475 320,460 L 320,110 L 350,130 L 400,80 L 300,0 C 290,30 260,50 200,50 C 140,50 110,30 100,0 Z"
-      fill={$designState.shirtColor}
-    />
-  </svg>
+  {#if $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'}
+    <img class="shirt-img" src="/mockups/white.png" alt="White t-shirt" draggable="false" />
+  {:else}
+    <img class="shirt-img" src="/mockups/black.png" alt="Black t-shirt" draggable="false" />
+  {/if}
 
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
@@ -297,10 +291,12 @@
     justify-content: center;
   }
 
-  .shirt-svg {
+  .shirt-img {
     width: 80%;
     height: 80%;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
   }
 
   .design-overlay {

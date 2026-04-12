@@ -13,9 +13,7 @@
   import ExportButton from '$lib/components/ExportButton.svelte';
 
   const shirtPresets = [
-    { label: 'Red', value: '#cc0000' },
     { label: 'Black', value: '#1a1a1a' },
-    { label: 'Grey', value: '#808080' },
     { label: 'White', value: '#f0f0f0' },
   ];
 </script>
