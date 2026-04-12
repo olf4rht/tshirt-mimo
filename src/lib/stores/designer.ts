@@ -14,7 +14,7 @@ export const designState = writable({
   inflate: 0,
   stretch: 0,
   roughEdges: 0,
-  strokeEnabled: false,
+  strokeEnabled: true,
   strokeWeight: 2,
   strokeColor: '#ffffff',
   strokeBlur: 0,

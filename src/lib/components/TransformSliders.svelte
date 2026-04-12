@@ -75,11 +75,11 @@
     color: #B0B0B0;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
-    min-width: 80px;
+    letter-spacing: -0.43px;
   }
 
   input[type='range'] {

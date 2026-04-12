@@ -5,8 +5,6 @@
   import FontPicker from '$lib/components/FontPicker.svelte';
   import TransformSliders from '$lib/components/TransformSliders.svelte';
   import StrokeControls from '$lib/components/StrokeControls.svelte';
-  import StrokeEffects from '$lib/components/StrokeEffects.svelte';
-  import ColorControls from '$lib/components/ColorControls.svelte';
   import StampManager from '$lib/components/StampManager.svelte';
   import TshirtPreview from '$lib/components/TshirtPreview.svelte';
   import ExportButton from '$lib/components/ExportButton.svelte';
@@ -117,8 +115,6 @@
         </div>
 
         <StrokeControls />
-        <StrokeEffects />
-        <ColorControls />
       {:else if $activeTab === 'stamps'}
         <StampManager />
       {:else}
@@ -230,10 +226,11 @@
     cursor: pointer;
     padding: 6px 12px;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     background: transparent;
     color: #000;
+    letter-spacing: -0.43px;
     transition: all 0.2s ease;
   }
 
@@ -286,22 +283,26 @@
     color: #B0B0B0;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
+    letter-spacing: -0.43px;
   }
 
   /* Position 3x3 grid */
   .position-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    gap: 12px 24px;
+    background: #FDFDFD;
+    border-radius: 7px;
+    padding: 11px 12px;
   }
 
   .pos-dot {
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: #CECDCC;
     border: none;
@@ -321,7 +322,7 @@
   /* Pill group (Size, Stroke type) */
   .pill-group {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-wrap: wrap;
   }
 
@@ -331,6 +332,7 @@
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: -0.43px;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;

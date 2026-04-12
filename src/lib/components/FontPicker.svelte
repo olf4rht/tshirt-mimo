@@ -1,46 +1,54 @@
 <script lang="ts">
   import { FONTS } from '$lib/data/fonts';
   import { designState } from '$lib/stores/designer';
+
+  let dropdownOpen = $state(false);
+
+  let currentFont = $derived(FONTS[$designState.fontIndex] ?? FONTS[0]);
 </script>
 
-<div class="font-picker">
-  <div class="font-header">
-    <span class="control-label">Font</span>
-    <input
-      type="color"
-      class="text-color-dot"
-      value={$designState.textColor}
-      oninput={(e: Event) => {
-        $designState.textColor = (e.target as HTMLInputElement).value;
-      }}
-    />
+<div class="font-row">
+  <span class="control-label">Font</span>
+
+  <div class="dropdown-wrapper">
+    <button class="dropdown-pill" onclick={() => dropdownOpen = !dropdownOpen}>
+      <span class="dropdown-text">{currentFont.label}</span>
+      <svg class="chevron" width="5" height="4" viewBox="0 0 5 4" fill="none">
+        <path d="M2.5 4L0 0h5L2.5 4z" fill="#B0B0B0"/>
+      </svg>
+    </button>
+
+    {#if dropdownOpen}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="dropdown-backdrop" onclick={() => dropdownOpen = false}></div>
+      <div class="dropdown-menu">
+        {#each FONTS as font, i}
+          <button
+            class="dropdown-item"
+            class:dropdown-active={$designState.fontIndex === i}
+            onclick={() => { $designState.fontIndex = i; dropdownOpen = false; }}
+          >{font.label}</button>
+        {/each}
+      </div>
+    {/if}
   </div>
-  <div class="thumbnails">
-    {#each FONTS as font, i}
-      <button
-        class="thumb"
-        class:active={$designState.fontIndex === i}
-        onclick={() => $designState.fontIndex = i}
-        title={font.label}
-      >
-        <img src={font.src} alt={font.label} />
-      </button>
-    {/each}
-  </div>
+
+  <input
+    type="color"
+    class="color-dot"
+    value={$designState.textColor}
+    oninput={(e: Event) => {
+      $designState.textColor = (e.target as HTMLInputElement).value;
+    }}
+  />
 </div>
 
 <style>
-  .font-picker {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .font-header {
+  .font-row {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
   }
 
   .control-label {
@@ -48,70 +56,114 @@
     color: #B0B0B0;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: -0.43px;
   }
 
-  .text-color-dot {
+  .dropdown-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dropdown-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    background: #EDEDEB;
+    border: none;
+    border-radius: 26px;
+    padding: 5px 10px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .dropdown-text {
+    font-size: 10px;
+    font-weight: 600;
+    color: #B0B0B0;
+    text-transform: uppercase;
+    letter-spacing: -0.43px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: left;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+  }
+
+  .dropdown-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 100;
+    padding: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: -0.43px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.1s;
+  }
+
+  .dropdown-item:hover {
+    background: #F4F4F4;
+  }
+
+  .dropdown-item.dropdown-active {
+    background: #EDEDEB;
+    color: #333;
+  }
+
+  .color-dot {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border: none;
     border-radius: 50%;
     background: none;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
   }
 
-  .text-color-dot::-webkit-color-swatch-wrapper {
+  .color-dot::-webkit-color-swatch-wrapper {
     padding: 0;
   }
 
-  .text-color-dot::-webkit-color-swatch {
+  .color-dot::-webkit-color-swatch {
     border: none;
     border-radius: 50%;
-  }
-
-  .thumbnails {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .thumbnails::-webkit-scrollbar {
-    display: none;
-  }
-
-  .thumb {
-    flex-shrink: 0;
-    width: 56px;
-    height: 38px;
-    background: #fff;
-    border-radius: 8px;
-    padding: 4px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.15s ease;
-  }
-
-  .thumb:hover {
-    border-color: #CECDCC;
-  }
-
-  .thumb.active {
-    border-color: #333;
-  }
-
-  .thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
 </style>

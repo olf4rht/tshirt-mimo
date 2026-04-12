@@ -55,12 +55,12 @@
 
 <style>
   .export-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.08);
-    color: #666;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(176, 176, 176, 0.3);
+    border-radius: 100px;
+    background: #F4F4F4;
+    color: #B0B0AA;
     cursor: pointer;
     display: flex;
     align-items: center;

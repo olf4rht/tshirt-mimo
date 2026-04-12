@@ -8,19 +8,6 @@
 <div class="stroke-controls">
   <div class="stroke-header">
     <span class="control-label">Stroke</span>
-    <label class="toggle">
-      <input
-        type="checkbox"
-        checked={$designState.strokeEnabled}
-        onchange={(e: Event) => {
-          $designState.strokeEnabled = (e.target as HTMLInputElement).checked;
-        }}
-      />
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-
-  {#if $designState.strokeEnabled}
     <div class="stroke-tabs">
       <button
         class="pill-btn"
@@ -43,86 +30,86 @@
         onclick={() => strokeTab = 'gradient'}
       >GRADIENT</button>
     </div>
+  </div>
 
-    <div class="stroke-content">
-      {#if strokeTab === 'weight'}
-        <div class="slider-row">
+  <div class="stroke-content">
+    {#if strokeTab === 'weight'}
+      <div class="slider-row">
+        <input
+          type="color"
+          class="color-dot-input"
+          value={$designState.strokeColor}
+          oninput={(e: Event) => {
+            $designState.strokeColor = (e.target as HTMLInputElement).value;
+          }}
+        />
+        <input
+          type="range"
+          min="0"
+          max="20"
+          step="0.5"
+          value={$designState.strokeWeight}
+          oninput={(e: Event) => {
+            $designState.strokeWeight = Number((e.target as HTMLInputElement).value);
+          }}
+        />
+      </div>
+    {:else if strokeTab === 'pixelized'}
+      <div class="slider-row">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={$designState.strokePixelized}
+          oninput={(e: Event) => {
+            $designState.strokePixelized = Number((e.target as HTMLInputElement).value);
+          }}
+        />
+      </div>
+    {:else if strokeTab === 'blur'}
+      <div class="slider-row">
+        <input
+          type="range"
+          min="0"
+          max="20"
+          step="0.5"
+          value={$designState.strokeBlur}
+          oninput={(e: Event) => {
+            $designState.strokeBlur = Number((e.target as HTMLInputElement).value);
+          }}
+        />
+      </div>
+    {:else if strokeTab === 'gradient'}
+      <div class="gradient-row">
+        <input
+          type="color"
+          class="color-dot-input"
+          value={$designState.strokeGradientStart}
+          oninput={(e: Event) => {
+            $designState.strokeGradientStart = (e.target as HTMLInputElement).value;
+          }}
+        />
+        <input
+          type="color"
+          class="color-dot-input"
+          value={$designState.strokeGradientEnd}
+          oninput={(e: Event) => {
+            $designState.strokeGradientEnd = (e.target as HTMLInputElement).value;
+          }}
+        />
+        <label class="toggle toggle-small">
           <input
-            type="color"
-            class="color-dot-input"
-            value={$designState.strokeColor}
-            oninput={(e: Event) => {
-              $designState.strokeColor = (e.target as HTMLInputElement).value;
+            type="checkbox"
+            checked={$designState.strokeGradientEnabled}
+            onchange={(e: Event) => {
+              $designState.strokeGradientEnabled = (e.target as HTMLInputElement).checked;
             }}
           />
-          <input
-            type="range"
-            min="0"
-            max="20"
-            step="0.5"
-            value={$designState.strokeWeight}
-            oninput={(e: Event) => {
-              $designState.strokeWeight = Number((e.target as HTMLInputElement).value);
-            }}
-          />
-        </div>
-      {:else if strokeTab === 'pixelized'}
-        <div class="slider-row">
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={$designState.strokePixelized}
-            oninput={(e: Event) => {
-              $designState.strokePixelized = Number((e.target as HTMLInputElement).value);
-            }}
-          />
-        </div>
-      {:else if strokeTab === 'blur'}
-        <div class="slider-row">
-          <input
-            type="range"
-            min="0"
-            max="20"
-            step="0.5"
-            value={$designState.strokeBlur}
-            oninput={(e: Event) => {
-              $designState.strokeBlur = Number((e.target as HTMLInputElement).value);
-            }}
-          />
-        </div>
-      {:else if strokeTab === 'gradient'}
-        <div class="gradient-row">
-          <input
-            type="color"
-            class="color-dot-input"
-            value={$designState.strokeGradientStart}
-            oninput={(e: Event) => {
-              $designState.strokeGradientStart = (e.target as HTMLInputElement).value;
-            }}
-          />
-          <input
-            type="color"
-            class="color-dot-input"
-            value={$designState.strokeGradientEnd}
-            oninput={(e: Event) => {
-              $designState.strokeGradientEnd = (e.target as HTMLInputElement).value;
-            }}
-          />
-          <label class="toggle toggle-small">
-            <input
-              type="checkbox"
-              checked={$designState.strokeGradientEnabled}
-              onchange={(e: Event) => {
-                $designState.strokeGradientEnabled = (e.target as HTMLInputElement).checked;
-              }}
-            />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      {/if}
-    </div>
-  {/if}
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -136,7 +123,7 @@
   .stroke-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
   }
 
   .control-label {
@@ -144,13 +131,16 @@
     color: #B0B0B0;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: -0.43px;
   }
 
   .stroke-tabs {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-wrap: wrap;
   }
 
@@ -160,6 +150,7 @@
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: -0.43px;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;
@@ -200,8 +191,8 @@
   .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border: none;
     border-radius: 50%;
     background: none;
@@ -282,20 +273,13 @@
   .toggle-slider::before {
     content: '';
     position: absolute;
-    height: 14px;
-    width: 14px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: 0.2s;
-  }
-
-  .toggle-small .toggle-slider::before {
     height: 12px;
     width: 12px;
     left: 2px;
     bottom: 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: 0.2s;
   }
 
   .toggle input:checked + .toggle-slider {
@@ -303,10 +287,6 @@
   }
 
   .toggle input:checked + .toggle-slider::before {
-    transform: translateX(16px);
-  }
-
-  .toggle-small input:checked + .toggle-slider::before {
     transform: translateX(14px);
   }
 </style>
