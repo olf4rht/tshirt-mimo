@@ -129,13 +129,18 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 2px 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
+    line-height: 12px;
+    height: 17px;
+    display: flex;
+    align-items: center;
   }
 
   .stroke-tabs {
@@ -145,12 +150,17 @@
   }
 
   .pill-btn {
-    padding: 4px 10px;
+    padding: 0 5px;
     border-radius: 26px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: -0.43px;
+    line-height: 22px;
+    height: 18px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;

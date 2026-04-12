@@ -1,15 +1,74 @@
-:root {
-  --bg: #F3F3F3;
-  --toolbox-bg: #EBEAE7;
-  --inner-panel-bg: #F4F4F4;
-  --label-bg: #EDEDEB;
-  --label-text: #B0B0B0;
-  --active-pill-bg: rgba(255,255,255,0.85);
-  --inactive-pill-border: #CECDCC;
-  --radius: 20px;
-  --radius-inner: 30px;
-  --radius-pill: 26px;
-  --radius-label: 4px;
+/* SF Pro Display font faces */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYMEDIUM.OTF') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYBOLD.OTF') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYSEMIBOLDITALIC.OTF') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYHEAVYITALIC.OTF') format('opentype');
+  font-weight: 860;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYBLACKITALIC.OTF') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYLIGHTITALIC.OTF') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYTHINITALIC.OTF') format('opentype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro-display/SFPRODISPLAYULTRALIGHTITALIC.OTF') format('opentype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
 }
 
 * {
@@ -22,6 +81,6 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: #F3F3F3;
 }

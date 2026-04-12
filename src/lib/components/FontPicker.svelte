@@ -54,13 +54,18 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 2px 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
+    line-height: 12px;
+    height: 17px;
+    display: flex;
+    align-items: center;
   }
 
   .dropdown-wrapper {
@@ -83,11 +88,13 @@
   }
 
   .dropdown-text {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     color: #B0B0B0;
     text-transform: uppercase;
     letter-spacing: -0.43px;
+    line-height: 22px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -126,6 +133,7 @@
     border: none;
     background: transparent;
     padding: 6px 10px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     color: #666;

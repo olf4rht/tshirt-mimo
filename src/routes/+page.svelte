@@ -27,7 +27,6 @@
     sizeOptions.find(s => s.scale === $designState.designScale)?.label ?? 'M'
   );
 
-  // Position grid: 3x3, maps to designX/designY
   const positionGrid = [
     { x: 25, y: 20 }, { x: 50, y: 20 }, { x: 75, y: 20 },
     { x: 25, y: 45 }, { x: 50, y: 45 }, { x: 75, y: 45 },
@@ -42,7 +41,6 @@
     $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'
   );
 
-  // Auto-swap text color when shirt color changes
   $effect(() => {
     if (isWhiteShirt) {
       $designState.textColor = '#1a1a1a';
@@ -64,13 +62,11 @@
         >Manual Editor</button>
         <button
           class="tab-btn"
-          class:inactive={$activeTab !== 'stamps'}
           class:active={$activeTab === 'stamps'}
           onclick={() => $activeTab = 'stamps'}
         >Stamps</button>
         <button
           class="tab-btn"
-          class:inactive={$activeTab !== 'draw'}
           class:active={$activeTab === 'draw'}
           onclick={() => $activeTab = 'draw'}
         >Draw</button>
@@ -95,6 +91,7 @@
                   $designState.designX = pos.x;
                   $designState.designY = pos.y;
                 }}
+                aria-label="Position {i + 1}"
               ></button>
             {/each}
           </div>
@@ -156,7 +153,7 @@
           </div>
         </div>
 
-        <div class="bar-pill">
+        <div class="bar-pill bar-pill-toggle">
           <button
             class="side-btn"
             class:side-active={$shirtSide === 'front'}
@@ -172,7 +169,11 @@
 
       <!-- Bottom-right preview card -->
       <div class="preview-card">
-        <button class="preview-card-add">+</button>
+        <button class="preview-card-add" aria-label="Add design variant">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1v10M1 6h10" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
         <div class="preview-card-inner">
           <DesignSvgRenderer filterId="minipreview" />
         </div>
@@ -185,15 +186,14 @@
   :global(body) {
     margin: 0;
     background: #F3F3F3;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
 
   .app {
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: 417px 1fr;
     height: 100vh;
-    padding: 16px;
-    gap: 16px;
+    padding: 10px 0 0 9px;
     box-sizing: border-box;
   }
 
@@ -201,45 +201,50 @@
   .toolbox {
     background: #EBEAE7;
     border-radius: 20px;
-    padding: 16px;
+    padding: 12px 16px 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     min-height: 0;
+    height: 485px;
+    overflow: hidden;
   }
 
   .toolbox-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    padding: 0;
   }
 
   .tab-bar {
     display: flex;
-    gap: 4px;
+    gap: 0;
   }
 
   .tab-btn {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     background: transparent;
     color: #000;
     letter-spacing: -0.43px;
-    transition: all 0.2s ease;
+    line-height: 12px;
+    transition: opacity 0.15s ease;
   }
 
   .tab-btn.active {
     color: #000;
+    opacity: 1;
   }
 
   .tab-btn:not(.active) {
-    color: #000;
+    color: #B0B0B0;
     opacity: 0.5;
   }
 
@@ -247,10 +252,10 @@
     flex: 1;
     background: #F4F4F4;
     border-radius: 30px;
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     overflow-y: auto;
     min-height: 0;
     scrollbar-width: thin;
@@ -258,7 +263,7 @@
   }
 
   .inner-panel::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
 
   .inner-panel::-webkit-scrollbar-track {
@@ -267,7 +272,7 @@
 
   .inner-panel::-webkit-scrollbar-thumb {
     background: #ccc;
-    border-radius: 3px;
+    border-radius: 2px;
   }
 
   /* ===== CONTROL ROW ===== */
@@ -281,45 +286,53 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 2px 10px;
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
     letter-spacing: -0.43px;
+    line-height: 12px;
+    height: 17px;
+    display: flex;
+    align-items: center;
   }
 
   /* Position 3x3 grid */
   .position-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, auto);
     gap: 12px 24px;
     background: #FDFDFD;
     border-radius: 7px;
-    padding: 11px 12px;
+    padding: 11px 13px 11px 12px;
   }
 
   .pos-dot {
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: #CECDCC;
+    background: #D9D9D9;
     border: none;
     cursor: pointer;
     padding: 0;
-    transition: background 0.15s;
+    transition: all 0.15s;
   }
 
   .pos-dot.pos-active {
-    background: #4a9eff;
+    background: #3B82F6;
+    width: 6px;
+    height: 6px;
+    margin: -1px;
   }
 
   .pos-dot:hover:not(.pos-active) {
     background: #999;
   }
 
-  /* Pill group (Size, Stroke type) */
+  /* Pill group (Size) */
   .pill-group {
     display: flex;
     gap: 3px;
@@ -327,12 +340,17 @@
   }
 
   .pill-btn {
-    padding: 4px 10px;
+    padding: 0 5px;
     border-radius: 26px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: -0.43px;
+    line-height: 22px;
+    height: 18px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
     transition: all 0.15s;
     border: 1px solid #CECDCC;
@@ -356,7 +374,6 @@
   .main-area {
     display: flex;
     flex-direction: column;
-    gap: 0;
     min-height: 0;
     position: relative;
   }
@@ -382,7 +399,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 0 16px 10px 16px;
     gap: 12px;
     flex-shrink: 0;
   }
@@ -394,10 +411,13 @@
   }
 
   .branding {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 860;
     color: #000;
     white-space: nowrap;
+    letter-spacing: -0.43px;
+    line-height: 22px;
   }
 
   .bottom-bar-center {
@@ -413,13 +433,22 @@
     background: #EBEAE7;
     border-radius: 23.5px;
     padding: 6px 14px;
+    height: 43px;
+  }
+
+  .bar-pill-toggle {
+    padding: 4px;
+    gap: 0;
   }
 
   .bar-pill-label {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     color: #000;
     white-space: nowrap;
+    letter-spacing: -0.43px;
+    line-height: 12px;
   }
 
   .color-dots {
@@ -446,21 +475,24 @@
 
   .shirt-color-dot.dot-active {
     border-color: #333;
-    box-shadow: 0 0 0 2px #4a9eff;
+    box-shadow: 0 0 0 2px #3B82F6;
   }
 
   .side-btn {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 6px 14px;
-    border-radius: 23.5px;
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     background: transparent;
     color: #000;
     opacity: 0.2;
-    transition: all 0.2s;
+    letter-spacing: -0.43px;
+    line-height: 12px;
+    transition: all 0.15s;
   }
 
   .side-btn.side-active {
@@ -472,47 +504,47 @@
   .preview-card {
     background: #EBEAE7;
     border-radius: 20px;
-    width: 220px;
-    height: 150px;
+    width: 319px;
+    height: 207px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 9px;
     position: relative;
+    overflow: hidden;
   }
 
   .preview-card-add {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
+    top: 11px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: none;
-    background: rgba(0,0,0,0.08);
-    color: #666;
-    font-size: 16px;
+    background: rgba(0,0,0,0.06);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1;
+    transition: background 0.15s;
   }
 
   .preview-card-add:hover {
-    background: rgba(0,0,0,0.15);
+    background: rgba(0,0,0,0.12);
   }
 
   .preview-card-inner {
     flex: 1;
     background: #000;
-    border-radius: 14px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    padding: 12px;
-    margin-top: 6px;
+    padding: 16px;
+    margin-top: 40px;
   }
 
   .preview-card-inner :global(.font-svg) {
