@@ -167,20 +167,22 @@
 
   .preview-area {
     flex: 1;
-    background: #eaeaea;
+    background: #F6F4F5;
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 12px;
+    padding: 4px;
     min-height: 0;
+    overflow: hidden;
   }
 
   .preview-content {
     flex: 1;
     height: 100%;
     min-height: 0;
+    padding: 0;
   }
 
   .shirt-color-dots {
