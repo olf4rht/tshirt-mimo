@@ -16,18 +16,37 @@
     { label: 'Black', value: '#1a1a1a' },
     { label: 'White', value: '#f0f0f0' },
   ];
+
+  let isWhiteShirt = $derived(
+    $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'
+  );
+
+  // Auto-swap text color when shirt color changes
+  $effect(() => {
+    if (isWhiteShirt) {
+      $designState.textColor = '#1a1a1a';
+    } else {
+      $designState.textColor = '#ffffff';
+    }
+  });
 </script>
 
 <div class="app">
-  <div class="panel-left">
-    <div class="tab-toggle">
+  <div class="panel-left" style="background: {isWhiteShirt ? '#f0f0f0' : '#1a1a1a'}">
+    <div class="tab-toggle" style="background: {isWhiteShirt ? '#ddd' : '#111'}">
       <button
         class:active={$activeTab === 'draw'}
         onclick={() => $activeTab = 'draw'}
+        style={$activeTab === 'draw'
+          ? `background: ${isWhiteShirt ? '#1a1a1a' : '#fff'}; color: ${isWhiteShirt ? '#fff' : '#000'}`
+          : `color: ${isWhiteShirt ? '#888' : '#666'}`}
       >Draw</button>
       <button
         class:active={$activeTab === 'design'}
         onclick={() => $activeTab = 'design'}
+        style={$activeTab === 'design'
+          ? `background: ${isWhiteShirt ? '#1a1a1a' : '#fff'}; color: ${isWhiteShirt ? '#fff' : '#000'}`
+          : `color: ${isWhiteShirt ? '#888' : '#666'}`}
       >Design</button>
     </div>
     <div class="canvas-area">
