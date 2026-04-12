@@ -7,17 +7,14 @@
   async function handleExport() {
     exporting = true;
     try {
-      // Get the design SVG from the DOM
       const designSvg = document.querySelector('.design-overlay svg') as SVGSVGElement | null;
       const designSvgHtml = designSvg ? new XMLSerializer().serializeToString(designSvg) : '';
 
-      // Try to get drawing data from the draw canvas
       const drawCanvas = document.querySelector('canvas') as HTMLCanvasElement | null;
       let drawingDataUrl: string | null = null;
       if (drawCanvas) {
         const tempCtx = drawCanvas.getContext('2d');
         if (tempCtx) {
-          // Check if the canvas has any content (non-transparent pixels)
           const imageData = tempCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
           const hasContent = imageData.data.some((v, i) => i % 4 === 3 && v > 0);
           if (hasContent) {
@@ -48,36 +45,37 @@
   }
 </script>
 
-<button class="export-btn" onclick={handleExport} disabled={exporting}>
-  {exporting ? 'Exporting...' : 'Download PNG'}
+<button class="export-btn" onclick={handleExport} disabled={exporting} title="Download PNG">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
 </button>
 
 <style>
   .export-btn {
-    width: 100%;
-    padding: 12px 16px;
+    width: 32px;
+    height: 32px;
     border: none;
-    border-radius: 12px;
-    background: #ffffff;
-    color: #000000;
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.08);
+    color: #666;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
-    margin-top: 8px;
+    flex-shrink: 0;
   }
 
   .export-btn:hover:not(:disabled) {
-    background: #e0e0e0;
-    transform: translateY(-1px);
-  }
-
-  .export-btn:active:not(:disabled) {
-    transform: translateY(0);
+    background: rgba(0,0,0,0.15);
+    color: #333;
   }
 
   .export-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 </style>

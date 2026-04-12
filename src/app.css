@@ -1,9 +1,15 @@
 :root {
-  --bg: #f5f5f5;
-  --panel-dark: #1a1a1a;
-  --panel-toolbar: #222;
+  --bg: #F3F3F3;
+  --toolbox-bg: #EBEAE7;
+  --inner-panel-bg: #F4F4F4;
+  --label-bg: #EDEDEB;
+  --label-text: #B0B0B0;
+  --active-pill-bg: rgba(255,255,255,0.85);
+  --inactive-pill-border: #CECDCC;
   --radius: 20px;
-  --text-primary: #ffffff;
+  --radius-inner: 30px;
+  --radius-pill: 26px;
+  --radius-label: 4px;
 }
 
 * {
@@ -16,6 +22,6 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
 }

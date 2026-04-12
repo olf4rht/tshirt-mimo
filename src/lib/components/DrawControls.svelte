@@ -17,10 +17,7 @@
 
 <div class="draw-controls">
   <div class="slider-row">
-    <label>
-      <span class="label-text">Brush Size</span>
-      <span class="label-value">{$drawState.brushSize}px</span>
-    </label>
+    <span class="control-label">Brush Size</span>
     <input
       type="range"
       min="1"
@@ -31,9 +28,10 @@
   </div>
 
   <div class="color-row">
-    <span class="label-text">Brush Color</span>
+    <span class="control-label">Brush Color</span>
     <input
       type="color"
+      class="color-dot-input"
       value={$drawState.brushColor}
       oninput={handleColorChange}
     />
@@ -54,41 +52,56 @@
 
   .slider-row {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  label {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
   }
 
-  .label-text {
-    color: #ccc;
-    font-size: 13px;
-    font-weight: 500;
-  }
-
-  .label-value {
-    color: #888;
+  .control-label {
+    background: #EDEDEB;
+    color: #B0B0B0;
     font-size: 12px;
-    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 80px;
   }
 
   .color-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
+  }
+
+  .color-dot-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .color-dot-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .color-dot-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
   }
 
   input[type='range'] {
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
-    height: 4px;
-    background: #444;
-    border-radius: 2px;
+    flex: 1;
+    height: 2px;
+    background: #D4D4D4;
+    border-radius: 1px;
     outline: none;
     cursor: pointer;
   }
@@ -96,58 +109,37 @@
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #fff;
+    background: #666;
     cursor: pointer;
   }
 
   input[type='range']::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #fff;
+    background: #666;
     border: none;
     cursor: pointer;
-  }
-
-  input[type='color'] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 28px;
-    height: 28px;
-    border: 2px solid #555;
-    border-radius: 50%;
-    background: none;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  input[type='color']::-webkit-color-swatch-wrapper {
-    padding: 2px;
-  }
-
-  input[type='color']::-webkit-color-swatch {
-    border: none;
-    border-radius: 50%;
   }
 
   .clear-btn {
-    margin-top: 4px;
     padding: 8px 16px;
-    border: 1px solid #555;
-    border-radius: 8px;
+    border: 1px solid #CECDCC;
+    border-radius: 26px;
     background: transparent;
-    color: #ccc;
-    font-size: 13px;
+    color: #B0B0B0;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    align-self: flex-start;
   }
 
   .clear-btn:hover {
-    background: #333;
-    border-color: #888;
-    color: #fff;
+    background: rgba(255,255,255,0.85);
+    color: #666;
   }
 </style>

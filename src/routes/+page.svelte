@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { activeTab, designState } from '$lib/stores/designer';
-  import DesignCanvas from '$lib/components/DesignCanvas.svelte';
+  import { activeTab, designState, shirtSide } from '$lib/stores/designer';
   import DrawCanvas from '$lib/components/DrawCanvas.svelte';
   import DrawControls from '$lib/components/DrawControls.svelte';
   import FontPicker from '$lib/components/FontPicker.svelte';
@@ -11,11 +10,35 @@
   import StampManager from '$lib/components/StampManager.svelte';
   import TshirtPreview from '$lib/components/TshirtPreview.svelte';
   import ExportButton from '$lib/components/ExportButton.svelte';
+  import DesignSvgRenderer from '$lib/components/DesignSvgRenderer.svelte';
 
   const shirtPresets = [
     { label: 'Black', value: '#1a1a1a' },
     { label: 'White', value: '#f0f0f0' },
   ];
+
+  const sizeOptions = [
+    { label: 'XS', scale: 0.5 },
+    { label: 'S', scale: 0.75 },
+    { label: 'M', scale: 1 },
+    { label: 'L', scale: 1.5 },
+    { label: 'XL', scale: 2 },
+  ];
+
+  let currentSizeLabel = $derived(
+    sizeOptions.find(s => s.scale === $designState.designScale)?.label ?? 'M'
+  );
+
+  // Position grid: 3x3, maps to designX/designY
+  const positionGrid = [
+    { x: 25, y: 20 }, { x: 50, y: 20 }, { x: 75, y: 20 },
+    { x: 25, y: 45 }, { x: 50, y: 45 }, { x: 75, y: 45 },
+    { x: 25, y: 70 }, { x: 50, y: 70 }, { x: 75, y: 70 },
+  ];
+
+  let currentPosIndex = $derived(
+    positionGrid.findIndex(p => p.x === $designState.designX && p.y === $designState.designY)
+  );
 
   let isWhiteShirt = $derived(
     $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'
@@ -32,66 +55,132 @@
 </script>
 
 <div class="app">
-  <div class="panel-left" style="background: {isWhiteShirt ? '#f0f0f0' : '#1a1a1a'}">
-    <div class="tab-toggle" style="background: {isWhiteShirt ? '#ddd' : '#111'}">
-      <button
-        class:active={$activeTab === 'draw'}
-        onclick={() => $activeTab = 'draw'}
-        style={$activeTab === 'draw'
-          ? `background: ${isWhiteShirt ? '#1a1a1a' : '#fff'}; color: ${isWhiteShirt ? '#fff' : '#000'}`
-          : `color: ${isWhiteShirt ? '#888' : '#666'}`}
-      >Draw</button>
-      <button
-        class:active={$activeTab === 'design'}
-        onclick={() => $activeTab = 'design'}
-        style={$activeTab === 'design'
-          ? `background: ${isWhiteShirt ? '#1a1a1a' : '#fff'}; color: ${isWhiteShirt ? '#fff' : '#000'}`
-          : `color: ${isWhiteShirt ? '#888' : '#666'}`}
-      >Design</button>
+  <!-- LEFT: Toolbox -->
+  <div class="toolbox">
+    <div class="toolbox-header">
+      <div class="tab-bar">
+        <button
+          class="tab-btn"
+          class:active={$activeTab === 'design'}
+          onclick={() => $activeTab = 'design'}
+        >Manual Editor</button>
+        <button
+          class="tab-btn"
+          class:inactive={$activeTab !== 'stamps'}
+          class:active={$activeTab === 'stamps'}
+          onclick={() => $activeTab = 'stamps'}
+        >Stamps</button>
+        <button
+          class="tab-btn"
+          class:inactive={$activeTab !== 'draw'}
+          class:active={$activeTab === 'draw'}
+          onclick={() => $activeTab = 'draw'}
+        >Draw</button>
+      </div>
+      <ExportButton />
     </div>
-    <div class="canvas-area">
+
+    <div class="inner-panel">
       {#if $activeTab === 'design'}
-        <DesignCanvas />
+        <FontPicker />
+        <TransformSliders />
+
+        <!-- Position selector -->
+        <div class="control-row">
+          <span class="control-label">Position</span>
+          <div class="position-grid">
+            {#each positionGrid as pos, i}
+              <button
+                class="pos-dot"
+                class:pos-active={currentPosIndex === i}
+                onclick={() => {
+                  $designState.designX = pos.x;
+                  $designState.designY = pos.y;
+                }}
+              ></button>
+            {/each}
+          </div>
+        </div>
+
+        <!-- Size selector -->
+        <div class="control-row">
+          <span class="control-label">Size</span>
+          <div class="pill-group">
+            {#each sizeOptions as opt}
+              <button
+                class="pill-btn"
+                class:pill-active={currentSizeLabel === opt.label}
+                onclick={() => $designState.designScale = opt.scale}
+              >{opt.label}</button>
+            {/each}
+          </div>
+        </div>
+
+        <StrokeControls />
+        <StrokeEffects />
+        <ColorControls />
+      {:else if $activeTab === 'stamps'}
+        <StampManager />
       {:else}
-        <DrawCanvas />
+        <DrawControls />
       {/if}
     </div>
   </div>
 
-  <div class="panel-right">
-    <div class="preview-area">
-      <div class="shirt-color-dots">
-        {#each shirtPresets as preset}
-          <button
-            class="color-dot"
-            class:active={$designState.shirtColor === preset.value}
-            style="background-color: {preset.value};"
-            title={preset.label}
-            onclick={() => { $designState.shirtColor = preset.value; }}
-          ></button>
-        {/each}
-      </div>
-      <div class="preview-content">
-        <TshirtPreview />
-      </div>
-      <button class="like-btn" title="Like this design">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-        </svg>
-      </button>
-    </div>
-    <div class="toolbar-area">
-      {#if $activeTab === 'design'}
-        <FontPicker />
-        <TransformSliders />
-        <StrokeControls />
-        <StrokeEffects />
-        <ColorControls />
-      {:else}
-        <DrawControls />
+  <!-- MAIN: T-shirt preview area -->
+  <div class="main-area">
+    <div class="shirt-preview-area">
+      {#if $activeTab === 'draw'}
+        <div class="draw-overlay">
+          <DrawCanvas />
+        </div>
       {/if}
-      <StampManager />
-      <ExportButton />
+      <TshirtPreview />
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="bottom-bar-left">
+        <span class="branding">balok x cheb mimo</span>
+      </div>
+
+      <div class="bottom-bar-center">
+        <div class="bar-pill">
+          <span class="bar-pill-label">T-shirt color</span>
+          <div class="color-dots">
+            {#each shirtPresets as preset}
+              <button
+                class="shirt-color-dot"
+                class:dot-active={$designState.shirtColor === preset.value}
+                style="background-color: {preset.value};"
+                title={preset.label}
+                onclick={() => { $designState.shirtColor = preset.value; }}
+              ></button>
+            {/each}
+          </div>
+        </div>
+
+        <div class="bar-pill">
+          <button
+            class="side-btn"
+            class:side-active={$shirtSide === 'front'}
+            onclick={() => $shirtSide = 'front'}
+          >Front</button>
+          <button
+            class="side-btn"
+            class:side-active={$shirtSide === 'back'}
+            onclick={() => $shirtSide = 'back'}
+          >Back</button>
+        </div>
+      </div>
+
+      <!-- Bottom-right preview card -->
+      <div class="preview-card">
+        <button class="preview-card-add">+</button>
+        <div class="preview-card-inner">
+          <DesignSvgRenderer filterId="minipreview" />
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -99,172 +188,334 @@
 <style>
   :global(body) {
     margin: 0;
-    background: #f5f5f5;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #F3F3F3;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   .app {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 400px 1fr;
     height: 100vh;
     padding: 16px;
     gap: 16px;
     box-sizing: border-box;
   }
 
-  .panel-left {
-    display: flex;
-    flex-direction: column;
-    background: #1a1a1a;
+  /* ===== TOOLBOX (left) ===== */
+  .toolbox {
+    background: #EBEAE7;
     border-radius: 20px;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     min-height: 0;
   }
 
-  .tab-toggle {
+  .toolbox-header {
     display: flex;
-    align-self: center;
-    background: #111;
-    border-radius: 999px;
-    padding: 4px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .tab-bar {
+    display: flex;
     gap: 4px;
   }
 
-  .tab-toggle button {
+  .tab-btn {
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 8px 24px;
-    border-radius: 999px;
+    padding: 6px 12px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     background: transparent;
-    color: #666;
+    color: #000;
     transition: all 0.2s ease;
   }
 
-  .tab-toggle button.active {
-    background: #ffffff;
-    color: #000000;
+  .tab-btn.active {
+    color: #000;
   }
 
-  .canvas-area {
+  .tab-btn:not(.active) {
+    color: #000;
+    opacity: 0.5;
+  }
+
+  .inner-panel {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    min-height: 0;
-  }
-
-  .panel-right {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 0;
-  }
-
-  .preview-area {
-    flex: 1;
-    background: #F6F4F5;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 4px;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .preview-content {
-    flex: 1;
-    height: 100%;
-    min-height: 0;
-    padding: 0;
-  }
-
-  .shirt-color-dots {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 4px;
-    z-index: 2;
-    flex-shrink: 0;
-  }
-
-  .color-dot {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2.5px solid transparent;
-    cursor: pointer;
-    padding: 0;
-    outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    flex-shrink: 0;
-  }
-
-  .color-dot:hover {
-    border-color: #aaa;
-  }
-
-  .color-dot.active {
-    border-color: #333;
-    box-shadow: 0 0 0 2.5px #4a9eff;
-  }
-
-  .like-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: #fff;
-    color: #888;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    transition: all 0.15s ease;
-    z-index: 2;
-  }
-
-  .like-btn:hover {
-    color: #333;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-
-  .toolbar-area {
-    flex: 1;
-    background: #222;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    background: #F4F4F4;
+    border-radius: 30px;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
     overflow-y: auto;
     min-height: 0;
     scrollbar-width: thin;
-    scrollbar-color: #444 transparent;
+    scrollbar-color: #ccc transparent;
   }
 
-  .toolbar-area::-webkit-scrollbar {
+  .inner-panel::-webkit-scrollbar {
     width: 6px;
   }
 
-  .toolbar-area::-webkit-scrollbar-track {
+  .inner-panel::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .toolbar-area::-webkit-scrollbar-thumb {
-    background: #444;
+  .inner-panel::-webkit-scrollbar-thumb {
+    background: #ccc;
     border-radius: 3px;
+  }
+
+  /* ===== CONTROL ROW ===== */
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .control-label {
+    background: #EDEDEB;
+    color: #B0B0B0;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Position 3x3 grid */
+  .position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .pos-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #CECDCC;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+  }
+
+  .pos-dot.pos-active {
+    background: #4a9eff;
+  }
+
+  .pos-dot:hover:not(.pos-active) {
+    background: #999;
+  }
+
+  /* Pill group (Size, Stroke type) */
+  .pill-group {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .pill-btn {
+    padding: 4px 10px;
+    border-radius: 26px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid #CECDCC;
+    background: transparent;
+    color: #CECDCC;
+    opacity: 0.6;
+  }
+
+  .pill-btn.pill-active {
+    background: rgba(255,255,255,0.85);
+    border-color: transparent;
+    color: #B0B0B0;
+    opacity: 1;
+  }
+
+  .pill-btn:hover:not(.pill-active) {
+    opacity: 0.8;
+  }
+
+  /* ===== MAIN AREA ===== */
+  .main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+    position: relative;
+  }
+
+  .shirt-preview-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .draw-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+  }
+
+  /* ===== BOTTOM BAR ===== */
+  .bottom-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 12px 0;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .bottom-bar-left {
+    display: flex;
+    align-items: flex-end;
+    min-width: 120px;
+  }
+
+  .branding {
+    font-size: 12px;
+    font-weight: 800;
+    color: #000;
+    white-space: nowrap;
+  }
+
+  .bottom-bar-center {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .bar-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #EBEAE7;
+    border-radius: 23.5px;
+    padding: 6px 14px;
+  }
+
+  .bar-pill-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    white-space: nowrap;
+  }
+
+  .color-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .shirt-color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .shirt-color-dot[style*="f0f0f0"],
+  .shirt-color-dot[style*="ffffff"] {
+    border-color: #ccc;
+  }
+
+  .shirt-color-dot.dot-active {
+    border-color: #333;
+    box-shadow: 0 0 0 2px #4a9eff;
+  }
+
+  .side-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 6px 14px;
+    border-radius: 23.5px;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+    color: #000;
+    opacity: 0.2;
+    transition: all 0.2s;
+  }
+
+  .side-btn.side-active {
+    background: #fff;
+    opacity: 1;
+  }
+
+  /* ===== PREVIEW CARD (bottom-right) ===== */
+  .preview-card {
+    background: #EBEAE7;
+    border-radius: 20px;
+    width: 220px;
+    height: 150px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    position: relative;
+  }
+
+  .preview-card-add {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.08);
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .preview-card-add:hover {
+    background: rgba(0,0,0,0.15);
+  }
+
+  .preview-card-inner {
+    flex: 1;
+    background: #000;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 12px;
+    margin-top: 6px;
+  }
+
+  .preview-card-inner :global(.font-svg) {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
   }
 </style>

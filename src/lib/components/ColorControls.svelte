@@ -3,18 +3,16 @@
 </script>
 
 <div class="color-controls">
-  <div class="section">
-    <div class="section-title">Text Color</div>
-    <div class="color-row">
-      <span class="label-text">Color</span>
-      <input
-        type="color"
-        value={$designState.textColor}
-        oninput={(e: Event) => {
-          $designState.textColor = (e.target as HTMLInputElement).value;
-        }}
-      />
-    </div>
+  <div class="color-row">
+    <span class="control-label">Text Color</span>
+    <input
+      type="color"
+      class="color-dot-input"
+      value={$designState.textColor}
+      oninput={(e: Event) => {
+        $designState.textColor = (e.target as HTMLInputElement).value;
+      }}
+    />
   </div>
 </div>
 
@@ -23,52 +21,42 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-  }
-
-  .section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .section-title {
-    color: #888;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    gap: 10px;
   }
 
   .color-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
   }
 
-  .label-text {
-    color: #ccc;
-    font-size: 13px;
-    font-weight: 500;
+  .control-label {
+    background: #EDEDEB;
+    color: #B0B0B0;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
   }
 
-  input[type='color'] {
+  .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 28px;
-    height: 28px;
-    border: 2px solid #555;
+    width: 22px;
+    height: 22px;
+    border: none;
     border-radius: 50%;
     background: none;
     cursor: pointer;
     padding: 0;
   }
 
-  input[type='color']::-webkit-color-swatch-wrapper {
-    padding: 2px;
+  .color-dot-input::-webkit-color-swatch-wrapper {
+    padding: 0;
   }
 
-  input[type='color']::-webkit-color-swatch {
+  .color-dot-input::-webkit-color-swatch {
     border: none;
     border-radius: 50%;
   }

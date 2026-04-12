@@ -4,7 +4,17 @@
 </script>
 
 <div class="font-picker">
-  <span class="label">Font</span>
+  <div class="font-header">
+    <span class="control-label">Font</span>
+    <input
+      type="color"
+      class="text-color-dot"
+      value={$designState.textColor}
+      oninput={(e: Event) => {
+        $designState.textColor = (e.target as HTMLInputElement).value;
+      }}
+    />
+  </div>
   <div class="thumbnails">
     {#each FONTS as font, i}
       <button
@@ -27,18 +37,46 @@
     width: 100%;
   }
 
-  .label {
-    color: #888;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  .font-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .control-label {
+    background: #EDEDEB;
+    color: #B0B0B0;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .text-color-dot {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .text-color-dot::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .text-color-dot::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
   }
 
   .thumbnails {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    gap: 6px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -50,9 +88,9 @@
 
   .thumb {
     flex-shrink: 0;
-    width: 60px;
-    height: 40px;
-    background: #333;
+    width: 56px;
+    height: 38px;
+    background: #fff;
     border-radius: 8px;
     padding: 4px;
     cursor: pointer;
@@ -64,17 +102,16 @@
   }
 
   .thumb:hover {
-    border-color: #555;
+    border-color: #CECDCC;
   }
 
   .thumb.active {
-    border-color: #fff;
+    border-color: #333;
   }
 
   .thumb img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: brightness(1);
   }
 </style>

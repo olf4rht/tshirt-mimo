@@ -1,8 +1,10 @@
 import { writable } from 'svelte/store';
 
-export type ActiveTab = 'design' | 'draw';
+export type ActiveTab = 'design' | 'stamps' | 'draw';
 
 export const activeTab = writable<ActiveTab>('design');
+
+export const shirtSide = writable<'front' | 'back'>('front');
 
 export const designState = writable({
   fontIndex: 0,
