@@ -261,7 +261,7 @@
   onpointermove={onContainerPointerMove}
   onpointerleave={onContainerPointerLeave}
 >
-  {#if $designState.shirtColor === '#f5f0a0'}
+  {#if $designState.shirtColor === '#faf6d6'}
     <img class="shirt-img" src="/mockups/yellow_{$shirtSide}.png" alt="Yellow t-shirt {$shirtSide}" draggable="false" />
   {:else if $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'}
     <img class="shirt-img" src="/mockups/white_{$shirtSide}.png" alt="White t-shirt {$shirtSide}" draggable="false" />

@@ -13,7 +13,7 @@
   const shirtPresets = [
     { label: 'Black', value: '#1a1a1a' },
     { label: 'White', value: '#f0f0f0' },
-    { label: 'Yellow', value: '#f5f0a0' },
+    { label: 'Yellow', value: '#faf6d6' },
   ];
 
   const sizeOptions = [
@@ -42,7 +42,7 @@
   let previewExpanded = $state(false);
 
   let isLightShirt = $derived(
-    $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff' || $designState.shirtColor === '#f5f0a0'
+    $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff' || $designState.shirtColor === '#faf6d6'
   );
 
   let previewBg = $derived(isLightShirt ? '#ffffff' : $designState.shirtColor);
