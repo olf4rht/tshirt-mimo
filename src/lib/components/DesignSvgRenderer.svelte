@@ -78,12 +78,12 @@
   );
 
   // Halftone: small fixed dots
-  const DOT_SPACING = 1.2;
-  const DOT_RADIUS = 0.35;
+  const DOT_SPACING = 0.6;
+  const DOT_RADIUS = 0.15;
 
-  // Pixelized halo: wide stroke + heavy blur creates smooth gradient from solid → dots → nothing
-  let outerStrokeWidth = $derived($designState.strokeWeight * 3);
-  let haloBlur = $derived(Math.max($designState.strokeWeight * 1.2, 3));
+  // Pixelized halo: wide stroke + moderate blur
+  let outerStrokeWidth = $derived($designState.strokeWeight * 2.5);
+  let haloBlur = $derived(Math.max($designState.strokeWeight * 0.6, 1.5));
 
 </script>
 
