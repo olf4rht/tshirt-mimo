@@ -9,4 +9,6 @@ export const FONTS = [
   { id: 'fustat', label: 'Fustat', src: '/fonts/Fustat.svg' },
   { id: 'nasim', label: 'Nasim', src: '/fonts/Nasim.svg' },
   { id: 'jh-naskh', label: 'JH Naskh Expanded Medium', src: '/fonts/JHNaskhExpandedMedium.svg' },
+  { id: 'forma-djr', label: 'Forma DJR Arabic Text', src: '/fonts/Forma DJR Arabic Text.svg' },
+  { id: 'zain-pc', label: 'Zain PC', src: '/fonts/zain pc v2  mob.svg' },
 ];
