@@ -13,6 +13,7 @@
   const shirtPresets = [
     { label: 'Black', value: '#1a1a1a' },
     { label: 'White', value: '#f0f0f0' },
+    { label: 'Yellow', value: '#f5f0a0' },
   ];
 
   const sizeOptions = [
@@ -40,11 +41,11 @@
 
   let previewExpanded = $state(false);
 
-  let isWhiteShirt = $derived(
-    $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'
+  let isLightShirt = $derived(
+    $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff' || $designState.shirtColor === '#f5f0a0'
   );
 
-  let previewBg = $derived(isWhiteShirt ? '#ffffff' : $designState.shirtColor);
+  let previewBg = $derived(isLightShirt ? '#ffffff' : $designState.shirtColor);
 
   let previewZoom = $state(1);
   let previewPanX = $state(0);
@@ -81,7 +82,7 @@
   }
 
   $effect(() => {
-    if (isWhiteShirt) {
+    if (isLightShirt) {
       $designState.textColor = '#1a1a1a';
     } else {
       $designState.textColor = '#ffffff';
