@@ -239,9 +239,10 @@
       onpointermove={onPreviewPointerMove}
       onpointerup={onPreviewPointerUp}
     >
-      <div style="transform: translate({previewPanX}px, {previewPanY}px) scale({previewZoom}); pointer-events: none; {$designState.threeDEnabled ? `perspective: ${800 / $designState.designScale}px;` : ''}">
+      <div style="transform: translate({previewPanX}px, {previewPanY}px) scale({previewZoom}); pointer-events: none; {$designState.threeDEnabled ? 'perspective: 800px;' : ''}">
         {#if $designState.threeDEnabled}
-          <div class="mini-3d-wrapper" style="transform: rotateX({$designState.rotateX}deg) rotateY({$designState.rotateY}deg) rotateZ({$designState.rotateZ}deg);">
+          {@const zScale = $designState.designScale}
+          <div class="mini-3d-wrapper" style="transform: scale({zScale}) rotateX({$designState.rotateX}deg) rotateY({$designState.rotateY}deg) rotateZ({$designState.rotateZ}deg);">
             {#if $designState.extrudeDepth > 0}
               {@const layers = Math.min($designState.extrudeDepth, 30)}
               {@const step = $designState.extrudeDepth / layers}
