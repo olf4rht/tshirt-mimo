@@ -87,6 +87,7 @@ export interface StampAsset {
 
 export const stampLibrary = writable<StampAsset[]>([
   { id: 'default-shakshouka', src: '/stamps/shakshouka_stamp.png' },
+  { id: 'default-stamp-02', src: '/stamps/stamp_02.svg' },
 ]);
 
 // Placed stamps: instances on the t-shirt (per side)
@@ -97,6 +98,7 @@ export interface PlacedStamp {
   x: number;
   y: number;
   scale: number;
+  rotation: number;
   side: 'front' | 'back';
 }
 

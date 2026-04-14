@@ -15,6 +15,9 @@
   let resizingStampId: string | null = $state(null);
   let stampResizeStartDist = $state(0);
   let stampResizeStartScale = $state(1);
+  let rotatingStampId: string | null = $state(null);
+  let rotateStartAngle = $state(0);
+  let rotateStartRotation = $state(0);
 
   // Cursor stamp preview
   let cursorX = $state(0);
@@ -185,6 +188,42 @@
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }
 
+  // --- Stamp rotation handlers ---
+  function onRotatePointerDown(e: PointerEvent, stampId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    rotatingStampId = stampId;
+    selectedStampId = stampId;
+    const stamp = $placedStamps.find((s) => s.id === stampId);
+    if (!stamp) return;
+    const center = getStampCenter(stamp);
+    rotateStartAngle = Math.atan2(e.clientY - center.cy, e.clientX - center.cx);
+    rotateStartRotation = stamp.rotation;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onRotatePointerMove(e: PointerEvent) {
+    if (!rotatingStampId) return;
+    e.preventDefault();
+    const stamp = $placedStamps.find((s) => s.id === rotatingStampId);
+    if (!stamp) return;
+    const center = getStampCenter(stamp);
+    const angle = Math.atan2(e.clientY - center.cy, e.clientX - center.cx);
+    const delta = (angle - rotateStartAngle) * (180 / Math.PI);
+    placedStamps.update((list) =>
+      list.map((s) =>
+        s.id === rotatingStampId
+          ? { ...s, rotation: rotateStartRotation + delta }
+          : s
+      )
+    );
+  }
+
+  function onRotatePointerUp(e: PointerEvent) {
+    rotatingStampId = null;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  }
+
   // --- Background click: place stamp or deselect ---
   function onBackgroundClick(e: MouseEvent) {
     if ($activeStampId && activeAsset) {
@@ -199,6 +238,7 @@
           x: Math.max(5, Math.min(95, px)),
           y: Math.max(5, Math.min(95, py)),
           scale: stampScale,
+          rotation: 0,
           side: $shirtSide,
         },
       ]);
@@ -323,7 +363,7 @@
       class="stamp-overlay"
       class:stamp-selected={selectedStampId === stamp.id}
       class:stamp-dragging={draggingStampId === stamp.id}
-      style="left: {stamp.x}%; top: {stamp.y}%; transform: translate(-50%, -50%) scale({stamp.scale})"
+      style="left: {stamp.x}%; top: {stamp.y}%; transform: translate(-50%, -50%) scale({stamp.scale}) rotate({stamp.rotation}deg)"
       onpointerdown={(e) => onStampPointerDown(e, stamp.id)}
       onpointermove={onStampPointerMove}
       onpointerup={onStampPointerUp}
@@ -360,6 +400,18 @@
           onpointermove={onStampHandlePointerMove}
           onpointerup={onStampHandlePointerUp}
         ></div>
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class="rotate-handle"
+          onpointerdown={(e) => onRotatePointerDown(e, stamp.id)}
+          onpointermove={onRotatePointerMove}
+          onpointerup={onRotatePointerUp}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1a5 5 0 1 1-3.5 1.5" stroke="#0078ff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M2 1v2h2" stroke="#0078ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       {/if}
     </div>
   {/each}
@@ -498,5 +550,26 @@
     bottom: -5px;
     right: -5px;
     cursor: nwse-resize;
+  }
+
+  .rotate-handle {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #0078ff;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rotate-handle:active {
+    cursor: grabbing;
   }
 </style>
