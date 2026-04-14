@@ -315,13 +315,14 @@
     class="design-overlay"
     class:selected
     class:dragging
-    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale}); {$designState.threeDEnabled ? 'perspective: 800px;' : ''}"
+    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale})"
     onpointerdown={onDesignPointerDown}
     onpointermove={onDesignPointerMove}
     onpointerup={onDesignPointerUp}
     onclick={(e) => e.stopPropagation()}
   >
     {#if $designState.threeDEnabled}
+      <div class="three-d-perspective" style="perspective: 800px;">
       <div
         class="three-d-wrapper"
         style="transform: rotateX({$designState.rotateX}deg) rotateY({$designState.rotateY}deg) rotateZ({$designState.rotateZ}deg);"
@@ -356,6 +357,7 @@
         <div class="front-face" style="transform: translateZ(0px);">
           <DesignSvgRenderer filterId="preview" />
         </div>
+      </div>
       </div>
     {:else}
       <DesignSvgRenderer filterId="preview" />
@@ -512,6 +514,10 @@
     width: 100%;
     height: auto;
     pointer-events: none;
+  }
+
+  .three-d-perspective {
+    width: 100%;
   }
 
   .three-d-wrapper {
