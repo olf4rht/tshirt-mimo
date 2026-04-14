@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { designState, stamps } from '$lib/stores/designer';
+  import { designState, placedStamps, shirtSide } from '$lib/stores/designer';
   import { exportDesign } from '$lib/utils/export';
 
   let exporting = $state(false);
@@ -25,11 +25,13 @@
 
       const blob = await exportDesign({
         shirtColor: $designState.shirtColor,
+        shirtSide: $shirtSide,
         designSvgHtml,
         designX: $designState.designX,
         designY: $designState.designY,
         designScale: $designState.designScale,
-        stamps: $stamps,
+        designVisible: $designState.designVisible,
+        stamps: $placedStamps,
         drawingDataUrl,
       });
 

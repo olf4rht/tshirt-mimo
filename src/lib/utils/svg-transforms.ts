@@ -294,10 +294,21 @@ function inflatePoint(
   const dist = Math.sqrt(dx * dx + dy * dy);
   if (dist === 0) return [x, y];
 
-  const factor = (amount / 100) * 0.5;
-  const push = 1 + factor * (dist / maxDim);
+  const normalized = dist / maxDim;
 
-  return [centerX + dx * push, centerY + dy * push];
+  if (amount >= 0) {
+    // Positive: inflate from center — center pushes outward, like a balloon
+    const factor = (amount / 100) * 4.5;
+    const centerBias = 1 - normalized; // stronger near center
+    const push = 1 + factor * centerBias;
+    return [centerX + dx * push, centerY + dy * push];
+  } else {
+    // Negative: inflate from edges — edges push outward, center stays
+    const factor = (Math.abs(amount) / 100) * 4.5;
+    const edgeFactor = normalized * normalized; // quadratic: edges move more
+    const push = 1 + factor * edgeFactor;
+    return [centerX + dx * push, centerY + dy * push];
+  }
 }
 
 /**

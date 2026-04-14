@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { stamps } from '$lib/stores/designer';
+  import { stampLibrary, activeStampId, stampSize } from '$lib/stores/designer';
 
   function onFileChange(e: Event) {
     const input = e.target as HTMLInputElement;
@@ -9,47 +9,73 @@
     const reader = new FileReader();
     reader.onload = () => {
       const src = reader.result as string;
-      stamps.update((list) => [
-        ...list,
-        {
-          id: Date.now().toString(),
-          src,
-          x: 50,
-          y: 50,
-          scale: 1,
-        },
-      ]);
+      const id = Date.now().toString();
+      stampLibrary.update((list) => [...list, { id, src }]);
+      // Auto-select the newly added stamp
+      $activeStampId = id;
     };
     reader.readAsDataURL(file);
     input.value = '';
   }
 
-  function removeStamp(id: string) {
-    stamps.update((list) => list.filter((s) => s.id !== id));
+  function removeAsset(id: string) {
+    stampLibrary.update((list) => list.filter((s) => s.id !== id));
+    if ($activeStampId === id) {
+      $activeStampId = null;
+    }
+  }
+
+  function selectStamp(id: string) {
+    $activeStampId = $activeStampId === id ? null : id;
   }
 </script>
 
 <div class="stamp-manager">
-  <label class="upload-btn">
-    Upload Stamp
-    <input
-      type="file"
-      accept=".svg,.png,image/svg+xml,image/png"
-      onchange={onFileChange}
-      hidden
-    />
-  </label>
-
-  {#if $stamps.length > 0}
-    <div class="stamp-list">
-      {#each $stamps as stamp (stamp.id)}
-        <div class="stamp-item">
-          <img src={stamp.src} alt="stamp" class="stamp-thumb" />
-          <button class="delete-btn" onclick={() => removeStamp(stamp.id)}>x</button>
-        </div>
-      {/each}
+  <!-- Stamp size row -->
+  <div class="size-row">
+    <span class="size-label">Stamp size</span>
+    <div class="slider-track-wrap">
+      <input
+        type="range"
+        min="10"
+        max="100"
+        bind:value={$stampSize}
+        class="size-slider"
+      />
     </div>
-  {/if}
+  </div>
+
+  <!-- Stamp grid -->
+  <div class="stamp-grid">
+    {#each $stampLibrary as asset (asset.id)}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div
+        class="stamp-cell"
+        class:stamp-active={$activeStampId === asset.id}
+        onclick={() => selectStamp(asset.id)}
+      >
+        <img src={asset.src} alt="stamp" class="stamp-thumb" />
+        <button
+          class="delete-btn"
+          onclick={(e) => { e.stopPropagation(); removeAsset(asset.id); }}
+        >×</button>
+      </div>
+    {/each}
+
+    <!-- Add stamp button -->
+    <label class="stamp-cell add-cell">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4v12M4 10h12" stroke="#b0b0b0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="file"
+        accept=".svg,.png,image/svg+xml,image/png"
+        onchange={onFileChange}
+        hidden
+      />
+    </label>
+  </div>
 </div>
 
 <style>
@@ -57,71 +83,123 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ===== SIZE ROW ===== */
+  .size-row {
+    display: flex;
+    align-items: center;
     gap: 10px;
   }
 
-  .upload-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 10px;
-    height: 18px;
-    background: rgba(255,255,255,0.85);
+  .size-label {
+    background: #EDEDEB;
     color: #B0B0B0;
-    border: none;
-    border-radius: 26px;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    font-size: 10px;
-    font-weight: 590;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
     letter-spacing: -0.43px;
-    text-transform: uppercase;
+    line-height: 17px;
+    height: 17px;
+  }
+
+  .slider-track-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .size-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    background: #CECDCC;
+    border-radius: 2px;
+    outline: none;
+  }
+
+  .size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #CECDCC;
     cursor: pointer;
-    transition: background 0.15s;
-    align-self: flex-start;
+    border: none;
   }
 
-  .upload-btn:hover {
-    background: #fff;
-    color: #666;
+  .size-slider::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #CECDCC;
+    cursor: pointer;
+    border: none;
   }
 
-  .stamp-list {
+  /* ===== STAMP GRID ===== */
+  .stamp-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
   }
 
-  .stamp-item {
+  .stamp-cell {
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 91px;
+    height: 92px;
     background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #EDEDEB;
+    overflow: hidden;
+    border: 2px solid transparent;
+    padding: 0;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .stamp-cell.stamp-active {
+    border-color: #7DC4F8;
   }
 
   .stamp-thumb {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 80%;
+    max-height: 80%;
     object-fit: contain;
+  }
+
+  .add-cell {
+    background: white;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .add-cell:hover {
+    opacity: 0.6;
   }
 
   .delete-btn {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 16px;
-    height: 16px;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
     border: none;
     border-radius: 50%;
-    background: #e44;
+    background: rgba(0,0,0,0.3);
     color: white;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    font-size: 9px;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 11px;
     font-weight: 590;
     letter-spacing: -0.43px;
     line-height: 1;
@@ -130,9 +208,15 @@
     align-items: center;
     justify-content: center;
     padding: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .stamp-cell:hover .delete-btn {
+    opacity: 1;
   }
 
   .delete-btn:hover {
-    background: #f55;
+    background: rgba(200,0,0,0.6);
   }
 </style>

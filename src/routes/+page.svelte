@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { activeTab, designState, shirtSide } from '$lib/stores/designer';
+  import { activeTab, designState, shirtSide, switchSide } from '$lib/stores/designer';
   import DrawCanvas from '$lib/components/DrawCanvas.svelte';
   import DrawControls from '$lib/components/DrawControls.svelte';
   import FontPicker from '$lib/components/FontPicker.svelte';
@@ -16,30 +16,69 @@
   ];
 
   const sizeOptions = [
-    { label: 'XS', scale: 0.5 },
-    { label: 'S', scale: 0.75 },
-    { label: 'M', scale: 1 },
-    { label: 'L', scale: 1.5 },
-    { label: 'XL', scale: 2 },
+    { label: 'XS', scale: 0.12 },
+    { label: 'S', scale: 0.18 },
+    { label: 'M', scale: 0.25 },
+    { label: 'L', scale: 0.35 },
+    { label: 'XL', scale: 0.5 },
   ];
 
   let currentSizeLabel = $derived(
     sizeOptions.find(s => s.scale === $designState.designScale)?.label ?? 'M'
   );
 
+  // Positions map to the chest printable area (blue rectangle zone)
   const positionGrid = [
-    { x: 25, y: 20 }, { x: 50, y: 20 }, { x: 75, y: 20 },
-    { x: 25, y: 45 }, { x: 50, y: 45 }, { x: 75, y: 45 },
-    { x: 25, y: 70 }, { x: 50, y: 70 }, { x: 75, y: 70 },
+    { x: 45, y: 28 }, { x: 50, y: 28 }, { x: 55, y: 28 },
+    { x: 45, y: 36 }, { x: 50, y: 36 }, { x: 55, y: 36 },
+    { x: 45, y: 44 }, { x: 50, y: 44 }, { x: 55, y: 44 },
   ];
 
   let currentPosIndex = $derived(
     positionGrid.findIndex(p => p.x === $designState.designX && p.y === $designState.designY)
   );
 
+  let previewExpanded = $state(false);
+
   let isWhiteShirt = $derived(
     $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'
   );
+
+  let previewBg = $derived(isWhiteShirt ? '#ffffff' : $designState.shirtColor);
+
+  let previewZoom = $state(1);
+  let previewPanX = $state(0);
+  let previewPanY = $state(0);
+  let previewDragging = $state(false);
+  let previewLastX = $state(0);
+  let previewLastY = $state(0);
+
+  function onPreviewWheel(e: WheelEvent) {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    previewZoom = Math.max(0.5, Math.min(5, previewZoom * delta));
+  }
+
+  function onPreviewPointerDown(e: PointerEvent) {
+    e.preventDefault();
+    previewDragging = true;
+    previewLastX = e.clientX;
+    previewLastY = e.clientY;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onPreviewPointerMove(e: PointerEvent) {
+    if (!previewDragging) return;
+    previewPanX += e.clientX - previewLastX;
+    previewPanY += e.clientY - previewLastY;
+    previewLastX = e.clientX;
+    previewLastY = e.clientY;
+  }
+
+  function onPreviewPointerUp(e: PointerEvent) {
+    previewDragging = false;
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+  }
 
   $effect(() => {
     if (isWhiteShirt) {
@@ -51,7 +90,7 @@
 </script>
 
 <div class="app">
-  <!-- LEFT: Toolbox -->
+  <!-- Toolbox (overlaid on left) -->
   <div class="toolbox">
     <div class="toolbox-header">
       <div class="tab-bar">
@@ -124,63 +163,81 @@
     </div>
   </div>
 
-  <!-- MAIN: T-shirt preview area -->
-  <div class="main-area">
-    <div class="shirt-preview-area">
-      {#if $activeTab === 'draw'}
-        <div class="draw-overlay">
-          <DrawCanvas />
-        </div>
-      {/if}
-      <TshirtPreview />
+  <!-- T-shirt preview (centered on full viewport) -->
+  <div class="shirt-preview-area">
+    {#if $activeTab === 'draw'}
+      <div class="draw-overlay">
+        <DrawCanvas />
+      </div>
+    {/if}
+    <TshirtPreview />
+  </div>
+
+  <!-- Branding -->
+  <div class="bottom-bar-left">
+    <span class="branding">balok x cheb mimo</span>
+  </div>
+
+  <!-- Center controls (move to top when expanded) -->
+  <div class="bar-controls" class:bar-top={previewExpanded}>
+    <div class="bar-pill">
+      <span class="bar-pill-label">T-shirt color</span>
+      <div class="color-dots">
+        {#each shirtPresets as preset}
+          <button
+            class="shirt-color-dot"
+            class:dot-active={$designState.shirtColor === preset.value}
+            style="background-color: {preset.value};"
+            title={preset.label}
+            onclick={() => { $designState.shirtColor = preset.value; }}
+          ></button>
+        {/each}
+      </div>
     </div>
 
-    <!-- Bottom bar -->
-    <div class="bottom-bar">
-      <div class="bottom-bar-left">
-        <span class="branding">balok x cheb mimo</span>
-      </div>
+    <div class="bar-pill bar-pill-toggle">
+      <button
+        class="side-btn"
+        class:side-active={$shirtSide === 'front'}
+        onclick={() => switchSide('front')}
+      >Front</button>
+      <button
+        class="side-btn"
+        class:side-active={$shirtSide === 'back'}
+        onclick={() => switchSide('back')}
+      >Back</button>
+    </div>
+  </div>
 
-      <div class="bottom-bar-center">
-        <div class="bar-pill">
-          <span class="bar-pill-label">T-shirt color</span>
-          <div class="color-dots">
-            {#each shirtPresets as preset}
-              <button
-                class="shirt-color-dot"
-                class:dot-active={$designState.shirtColor === preset.value}
-                style="background-color: {preset.value};"
-                title={preset.label}
-                onclick={() => { $designState.shirtColor = preset.value; }}
-              ></button>
-            {/each}
-          </div>
-        </div>
-
-        <div class="bar-pill bar-pill-toggle">
-          <button
-            class="side-btn"
-            class:side-active={$shirtSide === 'front'}
-            onclick={() => $shirtSide = 'front'}
-          >Front</button>
-          <button
-            class="side-btn"
-            class:side-active={$shirtSide === 'back'}
-            onclick={() => $shirtSide = 'back'}
-          >Back</button>
-        </div>
-      </div>
-
-      <!-- Bottom-right preview card -->
-      <div class="preview-card">
-        <button class="preview-card-add" aria-label="Add design variant">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M6 1v10M1 6h10" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
-        <div class="preview-card-inner">
-          <DesignSvgRenderer filterId="minipreview" />
-        </div>
+  <!-- Preview card (bottom-right, expandable) -->
+  <div class="preview-card" class:preview-expanded={previewExpanded}>
+    <button
+      class="preview-card-toggle"
+      aria-label={previewExpanded ? 'Minimize preview' : 'Expand preview'}
+      onclick={() => previewExpanded = !previewExpanded}
+    >
+      {#if previewExpanded}
+        <svg width="12" height="2" viewBox="0 0 12 2" fill="none">
+          <path d="M1 1h10" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      {:else}
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1v10M1 6h10" stroke="#666" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      {/if}
+    </button>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="preview-card-inner"
+      class:preview-inner-expanded={previewExpanded}
+      style="background: {previewBg}; cursor: {previewDragging ? 'grabbing' : 'grab'}"
+      onwheel={onPreviewWheel}
+      onpointerdown={onPreviewPointerDown}
+      onpointermove={onPreviewPointerMove}
+      onpointerup={onPreviewPointerUp}
+    >
+      <div style="transform: translate({previewPanX}px, {previewPanY}px) scale({previewZoom}); pointer-events: none">
+        <DesignSvgRenderer filterId="minipreview" />
       </div>
     </div>
   </div>
@@ -190,27 +247,29 @@
   :global(body) {
     margin: 0;
     background: #F3F3F3;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
 
   .app {
-    display: grid;
-    grid-template-columns: 417px 1fr;
+    position: relative;
+    width: 100vw;
     height: 100vh;
-    padding: 10px 0 0 9px;
-    box-sizing: border-box;
+    overflow: hidden;
   }
 
-  /* ===== TOOLBOX (left) ===== */
+  /* ===== TOOLBOX (overlaid left) ===== */
   .toolbox {
+    position: absolute;
+    top: 10px;
+    left: 9px;
+    width: 417px;
     background: #EBEAE7;
     border-radius: 20px;
     padding: 0;
     display: flex;
     flex-direction: column;
-    min-height: 0;
     overflow: hidden;
-    position: relative;
+    z-index: 20;
   }
 
   .toolbox-header {
@@ -232,7 +291,7 @@
     cursor: pointer;
     padding: 0;
     background: transparent;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     color: #000;
@@ -256,10 +315,10 @@
     flex: 1;
     background: #F4F4F4;
     border-radius: 30px;
-    padding: 22px 18px 18px;
+    padding: 22px 18px 26px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 22px;
     overflow-y: auto;
     min-height: 0;
     scrollbar-width: thin;
@@ -299,7 +358,7 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;
@@ -315,7 +374,7 @@
   .position-grid {
     display: grid;
     grid-template-columns: repeat(3, auto);
-    gap: 14px 26px;
+    gap: 12px 24px;
     background: #FDFDFD;
     border-radius: 7px;
     padding: 11px 13px 11px 12px;
@@ -355,7 +414,7 @@
   .pill-btn {
     padding: 0 5px;
     border-radius: 26px;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;
     text-transform: uppercase;
@@ -381,22 +440,14 @@
     opacity: 0.8;
   }
 
-  /* ===== MAIN AREA ===== */
-  .main-area {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    position: relative;
-  }
-
+  /* ===== T-SHIRT PREVIEW (centered on full viewport) ===== */
   .shirt-preview-area {
-    flex: 1;
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    min-height: 0;
-    overflow: hidden;
+    z-index: 1;
   }
 
   .draw-overlay {
@@ -405,24 +456,16 @@
     z-index: 10;
   }
 
-  /* ===== BOTTOM BAR ===== */
-  .bottom-bar {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    padding: 0 16px 10px 16px;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-
+  /* ===== BRANDING (bottom-left) ===== */
   .bottom-bar-left {
-    display: flex;
-    align-items: flex-end;
-    min-width: 120px;
+    position: absolute;
+    left: 24px;
+    bottom: 14px;
+    z-index: 20;
   }
 
   .branding {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 860;
     color: #000;
@@ -431,10 +474,22 @@
     line-height: 22px;
   }
 
-  .bottom-bar-center {
+  /* ===== CENTER CONTROLS ===== */
+  .bar-controls {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 8px;
     align-items: center;
+    z-index: 20;
+    transition: all 0.3s ease;
+  }
+
+  .bar-controls.bar-top {
+    bottom: auto;
+    top: 10px;
   }
 
   .bar-pill {
@@ -453,7 +508,7 @@
   }
 
   .bar-pill-label {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     color: #000;
@@ -493,9 +548,10 @@
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 8px 14px;
+    padding: 0 14px;
+    height: 36px;
     border-radius: 100px;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     background: transparent;
@@ -504,30 +560,43 @@
     letter-spacing: -0.43px;
     line-height: 12px;
     transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .side-btn.side-active {
     background: #fff;
     opacity: 1;
+    width: 47px;
   }
 
-  /* ===== PREVIEW CARD (bottom-right) ===== */
+  /* ===== PREVIEW CARD (bottom-right, expandable) ===== */
   .preview-card {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
     background: #EBEAE7;
     border-radius: 20px;
     width: 319px;
     height: 207px;
-    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     padding: 9px;
-    position: relative;
     overflow: hidden;
+    z-index: 20;
+    transition: all 0.3s ease;
   }
 
-  .preview-card-add {
+  .preview-card.preview-expanded {
+    width: 730px;
+    height: 428px;
+    padding: 9px 13px 13px;
+  }
+
+  .preview-card-toggle {
     position: absolute;
-    top: 11px;
+    top: 9px;
     right: 10px;
     width: 28px;
     height: 28px;
@@ -542,7 +611,7 @@
     transition: background 0.15s;
   }
 
-  .preview-card-add:hover {
+  .preview-card-toggle:hover {
     background: rgba(0,0,0,0.12);
   }
 
@@ -556,6 +625,12 @@
     overflow: hidden;
     padding: 16px;
     margin-top: 40px;
+    transition: border-radius 0.3s ease;
+  }
+
+  .preview-card-inner.preview-inner-expanded {
+    border-radius: 62px;
+    margin-top: 38px;
   }
 
   .preview-card-inner :global(.font-svg) {

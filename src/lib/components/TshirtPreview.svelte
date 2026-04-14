@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { designState, stamps } from '$lib/stores/designer';
+  import { designState, shirtSide, placedStamps, activeStampId, stampLibrary, stampSize, activeTab } from '$lib/stores/designer';
   import DesignSvgRenderer from './DesignSvgRenderer.svelte';
 
   let container: HTMLDivElement | undefined = $state();
@@ -15,6 +15,18 @@
   let resizingStampId: string | null = $state(null);
   let stampResizeStartDist = $state(0);
   let stampResizeStartScale = $state(1);
+
+  // Cursor stamp preview
+  let cursorX = $state(0);
+  let cursorY = $state(0);
+  let showCursorStamp = $state(false);
+  let cursorBaseWidth = $state(80);
+
+  // Get scale from stampSize slider (10-100 → 0.15-0.8)
+  let stampScale = $derived(0.15 + ($stampSize / 100) * 0.65);
+
+  // Get the active stamp asset
+  let activeAsset = $derived($stampLibrary.find(a => a.id === $activeStampId));
 
   function getContainerRect() {
     if (!container) return null;
@@ -93,8 +105,9 @@
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }
 
-  // --- Stamp handlers ---
+  // --- Placed stamp handlers ---
   function onStampPointerDown(e: PointerEvent, stampId: string) {
+    if ($activeStampId) return; // Don't drag when in stamp placement mode
     if (resizingStampId) return;
     e.preventDefault();
     e.stopPropagation();
@@ -108,7 +121,7 @@
     if (!draggingStampId) return;
     e.preventDefault();
     const { px, py } = toPercent(e.clientX, e.clientY);
-    stamps.update((list) =>
+    placedStamps.update((list) =>
       list.map((s) =>
         s.id === draggingStampId
           ? { ...s, x: Math.max(5, Math.min(95, px)), y: Math.max(5, Math.min(95, py)) }
@@ -136,7 +149,7 @@
     e.stopPropagation();
     resizingStampId = stampId;
     selectedStampId = stampId;
-    const stamp = $stamps.find((s) => s.id === stampId);
+    const stamp = $placedStamps.find((s) => s.id === stampId);
     if (!stamp) return;
     const center = getStampCenter(stamp);
     const dx = e.clientX - center.cx;
@@ -149,7 +162,7 @@
   function onStampHandlePointerMove(e: PointerEvent) {
     if (!resizingStampId) return;
     e.preventDefault();
-    const stamp = $stamps.find((s) => s.id === resizingStampId);
+    const stamp = $placedStamps.find((s) => s.id === resizingStampId);
     if (!stamp) return;
     const center = getStampCenter(stamp);
     const dx = e.clientX - center.cx;
@@ -157,7 +170,7 @@
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (stampResizeStartDist > 0) {
       const newScale = stampResizeStartScale * (dist / stampResizeStartDist);
-      stamps.update((list) =>
+      placedStamps.update((list) =>
         list.map((s) =>
           s.id === resizingStampId
             ? { ...s, scale: Math.max(0.2, Math.min(3, newScale)) }
@@ -172,21 +185,89 @@
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }
 
-  function onBackgroundClick() {
+  // --- Background click: place stamp or deselect ---
+  function onBackgroundClick(e: MouseEvent) {
+    if ($activeStampId && activeAsset) {
+      // Place a stamp instance on the shirt
+      const { px, py } = toPercent(e.clientX, e.clientY);
+      placedStamps.update((list) => [
+        ...list,
+        {
+          id: Date.now().toString(),
+          assetId: $activeStampId!,
+          src: activeAsset!.src,
+          x: Math.max(5, Math.min(95, px)),
+          y: Math.max(5, Math.min(95, py)),
+          scale: stampScale,
+          side: $shirtSide,
+        },
+      ]);
+      return;
+    }
     selected = false;
     selectedStampId = null;
   }
+
+  // --- Cursor tracking for stamp preview ---
+  function onContainerPointerMove(e: PointerEvent) {
+    if ($activeStampId && activeAsset) {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      showCursorStamp = true;
+      // Match cursor preview size to the actual placed stamp size (15% of container)
+      const rect = getContainerRect();
+      if (rect) {
+        cursorBaseWidth = rect.width * 0.15;
+      }
+    } else {
+      showCursorStamp = false;
+    }
+  }
+
+  function onContainerPointerLeave() {
+    showCursorStamp = false;
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape' && $activeStampId) {
+      $activeStampId = null;
+      showCursorStamp = false;
+      return;
+    }
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      if (selectedStampId) {
+        placedStamps.update((list) => list.filter((s) => s.id !== selectedStampId));
+        selectedStampId = null;
+      } else if (selected) {
+        $designState.designVisible = false;
+        selected = false;
+      }
+    }
+  }
+
+  $effect(() => {
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="tshirt-preview" bind:this={container} onclick={onBackgroundClick}>
+<div
+  class="tshirt-preview"
+  class:stamp-cursor={$activeStampId && activeAsset}
+  bind:this={container}
+  onclick={onBackgroundClick}
+  onpointermove={onContainerPointerMove}
+  onpointerleave={onContainerPointerLeave}
+>
   {#if $designState.shirtColor === '#f0f0f0' || $designState.shirtColor === '#ffffff'}
-    <img class="shirt-img" src="/mockups/white.png" alt="White t-shirt" draggable="false" />
+    <img class="shirt-img" src="/mockups/white_{$shirtSide}.png" alt="White t-shirt {$shirtSide}" draggable="false" />
   {:else}
-    <img class="shirt-img" src="/mockups/black.png" alt="Black t-shirt" draggable="false" />
+    <img class="shirt-img" src="/mockups/black_{$shirtSide}.png" alt="Black t-shirt {$shirtSide}" draggable="false" />
   {/if}
 
+  {#if $designState.designVisible}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="design-overlay"
@@ -231,9 +312,10 @@
       ></div>
     {/if}
   </div>
+  {/if}
 
-  <!-- Stamps layer (on top of design overlay) -->
-  {#each $stamps as stamp (stamp.id)}
+  <!-- Placed stamps layer -->
+  {#each $placedStamps as stamp (stamp.id)}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="stamp-overlay"
@@ -279,6 +361,16 @@
       {/if}
     </div>
   {/each}
+
+  <!-- Cursor stamp preview (follows mouse when stamp tool is active) -->
+  {#if showCursorStamp && activeAsset}
+    <div
+      class="cursor-stamp-preview"
+      style="left: {cursorX}px; top: {cursorY}px; width: {cursorBaseWidth}px; transform: translate(-50%, -50%) scale({stampScale})"
+    >
+      <img src={activeAsset.src} alt="stamp preview" draggable="false" />
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -291,11 +383,15 @@
     justify-content: center;
   }
 
+  .tshirt-preview.stamp-cursor {
+    cursor: none;
+  }
+
   .shirt-img {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 90%;
+    max-height: 85vh;
     width: auto;
-    height: 100%;
+    height: 85vh;
     object-fit: contain;
     pointer-events: none;
     user-select: none;
@@ -350,6 +446,20 @@
     width: 100%;
     height: auto;
     pointer-events: none;
+    display: block;
+  }
+
+  /* Cursor stamp preview */
+  .cursor-stamp-preview {
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.6;
+  }
+
+  .cursor-stamp-preview img {
+    width: 100%;
+    height: auto;
     display: block;
   }
 

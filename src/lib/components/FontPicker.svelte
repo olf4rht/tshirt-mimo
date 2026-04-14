@@ -48,14 +48,14 @@
   .font-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
     width: 100%;
   }
 
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;
@@ -82,13 +82,13 @@
     background: #EDEDEB;
     border: none;
     border-radius: 26px;
-    padding: 0 8px;
+    padding: 0 5px;
     cursor: pointer;
     outline: none;
   }
 
   .dropdown-text {
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;
     color: #B0B0B0;
@@ -133,7 +133,7 @@
     border: none;
     background: transparent;
     padding: 6px 10px;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;
     color: #666;
@@ -156,8 +156,8 @@
   .color-dot {
     -webkit-appearance: none;
     appearance: none;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;

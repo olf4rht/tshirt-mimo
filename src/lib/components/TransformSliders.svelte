@@ -5,6 +5,24 @@
 <div class="transform-sliders">
   <div class="slider-row">
     <div class="label-col">
+      <span class="control-label">Weight</span>
+    </div>
+    <div class="slider-col">
+      <input
+        type="range"
+        min="0"
+        max="20"
+        step="0.5"
+        value={$designState.fillWeight}
+        oninput={(e: Event) => {
+          $designState.fillWeight = Number((e.target as HTMLInputElement).value);
+        }}
+      />
+    </div>
+  </div>
+
+  <div class="slider-row">
+    <div class="label-col">
       <span class="control-label">Bend</span>
     </div>
     <div class="slider-col">
@@ -27,7 +45,7 @@
     <div class="slider-col">
       <input
         type="range"
-        min="0"
+        min="-100"
         max="100"
         value={$designState.inflate}
         oninput={(e: Event) => {
@@ -45,13 +63,15 @@
       <input
         type="range"
         min="0"
-        max="100"
+        max="8"
+        step="0.5"
         value={$designState.roughEdges}
         oninput={(e: Event) => {
           $designState.roughEdges = Number((e.target as HTMLInputElement).value);
         }}
       />
     </div>
+    <span class="debug-value">{$designState.roughEdges} → {($designState.roughEdges * 0.5).toFixed(1)}</span>
   </div>
 
   <div class="slider-row">
@@ -98,7 +118,7 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;
@@ -145,5 +165,13 @@
     height: 11px;
     background: #fff;
     border-radius: 5.5px;
+  }
+
+  .debug-value {
+    font-size: 9px;
+    color: #999;
+    margin-left: 6px;
+    white-space: nowrap;
+    font-family: monospace;
   }
 </style>

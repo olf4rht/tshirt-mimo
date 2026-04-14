@@ -1,7 +1,7 @@
 <script lang="ts">
   import { designState } from '$lib/stores/designer';
 
-  type StrokeTab = 'weight' | 'pixelized' | 'blur' | 'gradient';
+  type StrokeTab = 'weight' | 'pixelized' | 'blur' | 'opacity';
   let strokeTab: StrokeTab = $state('weight');
 </script>
 
@@ -26,23 +26,23 @@
       >BLUR</button>
       <button
         class="pill-btn"
-        class:pill-active={strokeTab === 'gradient'}
-        onclick={() => strokeTab = 'gradient'}
-      >GRADIENT</button>
+        class:pill-active={strokeTab === 'opacity'}
+        onclick={() => strokeTab = 'opacity'}
+      >OPACITY</button>
     </div>
   </div>
 
   <div class="stroke-content">
-    {#if strokeTab === 'weight'}
-      <div class="slider-row">
-        <input
-          type="color"
-          class="color-dot-input"
-          value={$designState.strokeColor}
-          oninput={(e: Event) => {
-            $designState.strokeColor = (e.target as HTMLInputElement).value;
-          }}
-        />
+    <div class="slider-row">
+      <input
+        type="color"
+        class="color-dot-input"
+        value={$designState.strokeColor}
+        oninput={(e: Event) => {
+          $designState.strokeColor = (e.target as HTMLInputElement).value;
+        }}
+      />
+      {#if strokeTab === 'weight'}
         <div class="stroke-slider-wrapper">
           <input
             type="range"
@@ -55,24 +55,19 @@
             }}
           />
         </div>
-      </div>
-    {:else if strokeTab === 'pixelized'}
-      <div class="slider-row">
-        <div class="stroke-slider-wrapper full">
+      {:else if strokeTab === 'pixelized'}
+        <label class="toggle toggle-small">
           <input
-            type="range"
-            min="0"
-            max="100"
-            value={$designState.strokePixelized}
-            oninput={(e: Event) => {
-              $designState.strokePixelized = Number((e.target as HTMLInputElement).value);
+            type="checkbox"
+            checked={$designState.strokePixelized > 0}
+            onchange={(e: Event) => {
+              $designState.strokePixelized = (e.target as HTMLInputElement).checked ? 1 : 0;
             }}
           />
-        </div>
-      </div>
-    {:else if strokeTab === 'blur'}
-      <div class="slider-row">
-        <div class="stroke-slider-wrapper full">
+          <span class="toggle-slider"></span>
+        </label>
+      {:else if strokeTab === 'blur'}
+        <div class="stroke-slider-wrapper">
           <input
             type="range"
             min="0"
@@ -84,37 +79,21 @@
             }}
           />
         </div>
-      </div>
-    {:else if strokeTab === 'gradient'}
-      <div class="gradient-row">
-        <input
-          type="color"
-          class="color-dot-input"
-          value={$designState.strokeGradientStart}
-          oninput={(e: Event) => {
-            $designState.strokeGradientStart = (e.target as HTMLInputElement).value;
-          }}
-        />
-        <input
-          type="color"
-          class="color-dot-input"
-          value={$designState.strokeGradientEnd}
-          oninput={(e: Event) => {
-            $designState.strokeGradientEnd = (e.target as HTMLInputElement).value;
-          }}
-        />
-        <label class="toggle toggle-small">
+      {:else if strokeTab === 'opacity'}
+        <div class="stroke-slider-wrapper">
           <input
-            type="checkbox"
-            checked={$designState.strokeGradientEnabled}
-            onchange={(e: Event) => {
-              $designState.strokeGradientEnabled = (e.target as HTMLInputElement).checked;
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={$designState.strokeOpacity}
+            oninput={(e: Event) => {
+              $designState.strokeOpacity = Number((e.target as HTMLInputElement).value);
             }}
           />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 </div>
 
@@ -135,7 +114,7 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;
@@ -156,7 +135,7 @@
   .pill-btn {
     padding: 0 5px;
     border-radius: 26px;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;
     text-transform: uppercase;
@@ -196,26 +175,16 @@
     width: 100%;
   }
 
-  .gradient-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
   .stroke-slider-wrapper {
     max-width: 190px;
     flex: 1;
   }
 
-  .stroke-slider-wrapper.full {
-    max-width: 100%;
-  }
-
   .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;
@@ -237,10 +206,10 @@
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 12px;
+    height: 13px;
     background: rgba(255,255,255,0.1);
     border: 1px solid #CECDCC;
-    border-radius: 6px;
+    border-radius: 6.5px;
     outline: none;
     cursor: pointer;
   }
@@ -266,10 +235,10 @@
   }
 
   input[type='range']::-moz-range-track {
-    height: 12px;
+    height: 13px;
     background: rgba(255,255,255,0.1);
     border: 1px solid #CECDCC;
-    border-radius: 6px;
+    border-radius: 6.5px;
   }
 
   .toggle {

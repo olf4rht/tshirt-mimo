@@ -61,7 +61,7 @@
   .control-label {
     background: #EDEDEB;
     color: #B0B0B0;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 12px;
     font-weight: 700;
     padding: 0 10px;
@@ -87,8 +87,8 @@
   .color-dot-input {
     -webkit-appearance: none;
     appearance: none;
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     border: 1px solid #CECDCC;
     border-radius: 50%;
     background: none;
@@ -148,7 +148,7 @@
     border-radius: 26px;
     background: transparent;
     color: #CECDCC;
-    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     font-size: 10px;
     font-weight: 590;
     letter-spacing: -0.43px;

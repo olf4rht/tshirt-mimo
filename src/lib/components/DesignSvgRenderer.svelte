@@ -12,7 +12,6 @@
   let paths: string[] = $state([]);
   let viewBox: string = $state('0 0 100 20');
 
-  // Use filterId to namespace filter IDs so multiple instances don't clash
   let prefix = $derived(filterId ? `${filterId}-` : '');
 
   $effect(() => {
@@ -37,7 +36,6 @@
 
   let computedViewBox = $derived.by(() => {
     if (transformedPaths.length === 0) return viewBox;
-    // Compute bounding box across all transformed paths
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const d of transformedPaths) {
       const cmds = toAbsolute(parsePath(d));
@@ -48,22 +46,28 @@
       if (bbox.maxY > maxY) maxY = bbox.maxY;
     }
     if (!isFinite(minX)) return viewBox;
-    // Add padding (10% of dimensions)
     const w = maxX - minX;
     const h = maxY - minY;
-    const pad = Math.max(w, h) * 0.1;
+    const pad = Math.max(w, h) * 0.15;
     return `${minX - pad} ${minY - pad} ${w + pad * 2} ${h + pad * 2}`;
   });
 
-  let hasStrokeEffects = $derived(
-    $designState.strokeBlur > 0 ||
-    $designState.strokeRoughEdges > 0 ||
-    $designState.strokePixelized > 0
-  );
+  let hasStrokeBlur = $derived($designState.strokeBlur > 0);
+  let hasStrokePixelized = $derived($designState.strokePixelized > 0);
+  let hasStrokeRoughEdges = $derived($designState.strokeRoughEdges > 0);
 
   let strokeColorValue = $derived(
     $designState.strokeGradientEnabled ? `url(#${prefix}stroke-gradient)` : $designState.strokeColor
   );
+
+  // Halftone: small fixed dots
+  const DOT_SPACING = 1.2;
+  const DOT_RADIUS = 0.35;
+
+  // Pixelized halo: wide stroke + heavy blur creates smooth gradient from solid → dots → nothing
+  let outerStrokeWidth = $derived($designState.strokeWeight * 3);
+  let haloBlur = $derived(Math.max($designState.strokeWeight * 1.2, 3));
+
 </script>
 
 <svg
@@ -74,44 +78,59 @@
   overflow="visible"
 >
   <defs>
-    <filter id="{prefix}stroke-effects" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur
-        stdDeviation={$designState.strokeBlur > 0 ? $designState.strokeBlur * 0.5 : 0}
-        result="blurred"
-      />
-      <feTurbulence
-        type="turbulence"
-        baseFrequency="0.05"
-        numOctaves="2"
-        seed="1"
-        result="noise"
-      />
-      <feDisplacementMap
-        in="blurred"
-        in2="noise"
-        scale={$designState.strokeRoughEdges > 0 ? $designState.strokeRoughEdges * 0.3 : 0}
-        result="roughened"
-      />
-      <feMorphology
-        in="roughened"
-        operator="erode"
-        radius={$designState.strokePixelized > 0 ? $designState.strokePixelized * 0.1 : 0}
-        result="eroded"
-      />
-      <feMorphology
-        in="eroded"
-        operator="dilate"
-        radius={$designState.strokePixelized > 0 ? $designState.strokePixelized * 0.1 : 0}
-      />
-    </filter>
-
-    {#if $designState.strokeGradientEnabled}
-      <linearGradient id="{prefix}stroke-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color={$designState.strokeGradientStart} />
-        <stop offset="100%" stop-color={$designState.strokeGradientEnd} />
-      </linearGradient>
+    <!-- Blur filter (stroke only) -->
+    {#if hasStrokeBlur}
+      <filter id="{prefix}stroke-blur" x="-200%" y="-200%" width="500%" height="500%">
+        <feGaussianBlur stdDeviation={$designState.strokeBlur * 0.5} />
+      </filter>
     {/if}
 
+    <!-- Stroke rough edges filter -->
+    {#if hasStrokeRoughEdges}
+      <filter id="{prefix}stroke-rough" x="-200%" y="-200%" width="500%" height="500%">
+        <feTurbulence
+          type="turbulence"
+          baseFrequency="0.05"
+          numOctaves="2"
+          seed="1"
+          result="noise"
+        />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="noise"
+          scale={$designState.strokeRoughEdges * 0.3}
+        />
+      </filter>
+    {/if}
+
+    <!-- Pixelized: heavy blur for smooth fade-out halo -->
+    {#if hasStrokePixelized}
+      <filter id="{prefix}stroke-halo-blur" x="-200%" y="-200%" width="500%" height="500%">
+        <feGaussianBlur stdDeviation={haloBlur} />
+      </filter>
+      <pattern
+        id="{prefix}dots-pattern"
+        x="0" y="0"
+        width={DOT_SPACING}
+        height={DOT_SPACING}
+        patternUnits="userSpaceOnUse"
+      >
+        <circle cx={DOT_SPACING / 2} cy={DOT_SPACING / 2} r={DOT_RADIUS} fill="white" />
+      </pattern>
+      <mask id="{prefix}halftone-mask" maskUnits="userSpaceOnUse" x="-99999" y="-99999" width="199998" height="199998">
+        <rect x="-99999" y="-99999" width="199998" height="199998" fill="url(#{prefix}dots-pattern)" />
+      </mask>
+    {/if}
+
+    <!-- Radial gradient for stroke -->
+    {#if $designState.strokeGradientEnabled}
+      <radialGradient id="{prefix}stroke-gradient" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color={$designState.strokeGradientStart} />
+        <stop offset="100%" stop-color={$designState.strokeGradientEnd} />
+      </radialGradient>
+    {/if}
+
+    <!-- Text distress filter -->
     <filter id="{prefix}text-distress" x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
         type="turbulence"
@@ -129,24 +148,66 @@
   </defs>
 
   <g filter={$designState.roughEdges > 0 ? `url(#${prefix}text-distress)` : undefined}>
-    {#if $designState.strokeEnabled}
-      <g
+    {#if $designState.strokeWeight > 0}
+      <g opacity={$designState.strokeOpacity / 100}>
+      {#if hasStrokePixelized}
+        <!-- LAYER 1: Wide blurred stroke + halftone dots = dotted halo fading at edges -->
+        <g
+          fill="none"
+          stroke={strokeColorValue}
+          stroke-width={outerStrokeWidth}
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          filter={`url(#${prefix}stroke-halo-blur)`}
+          mask={`url(#${prefix}halftone-mask)`}
+        >
+          {#each transformedPaths as d}
+            <path {d} />
+          {/each}
+        </g>
+
+        <!-- LAYER 2: Solid stroke at normal weight (with optional blur on top) -->
+        <g
+          fill="none"
+          stroke={strokeColorValue}
+          stroke-width={$designState.strokeWeight}
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          filter={hasStrokeBlur ? `url(#${prefix}stroke-blur)` : undefined}
+        >
+          {#each transformedPaths as d}
+            <path {d} />
+          {/each}
+        </g>
+      {:else}
+        <!-- Normal stroke (no pixelized) -->
+        <g
+          fill="none"
+          stroke={strokeColorValue}
+          stroke-width={$designState.strokeWeight}
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          filter={hasStrokeBlur ? `url(#${prefix}stroke-blur)` : hasStrokeRoughEdges ? `url(#${prefix}stroke-rough)` : undefined}
+        >
+          {#each transformedPaths as d}
+            <path {d} />
+          {/each}
+        </g>
+      {/if}
+      </g>
+    {/if}
+
+    <!-- Fill layer (on top) -->
+    {#each transformedPaths as d}
+      <path
+        {d}
         fill={$designState.textColor}
-        stroke={strokeColorValue}
-        stroke-width={$designState.strokeWeight}
+        stroke={$designState.fillWeight > 0 ? $designState.textColor : 'none'}
+        stroke-width={$designState.fillWeight}
         stroke-linejoin="round"
         stroke-linecap="round"
-        paint-order="stroke"
-        filter={hasStrokeEffects ? `url(#${prefix}stroke-effects)` : undefined}
-      >
-        {#each transformedPaths as d}
-          <path {d} />
-        {/each}
-      </g>
-    {:else}
-      {#each transformedPaths as d}
-        <path {d} fill={$designState.textColor} />
-      {/each}
-    {/if}
+        paint-order="stroke fill"
+      />
+    {/each}
   </g>
 </svg>
