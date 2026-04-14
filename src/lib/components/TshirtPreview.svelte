@@ -25,6 +25,12 @@
   let showCursorStamp = $state(false);
   let cursorBaseWidth = $state(80);
 
+  // Context menu
+  let contextMenu = $state<{ x: number; y: number; target: 'design' | 'stamp'; stampId?: string } | null>(null);
+
+  // Z-index counter for ordering
+  let nextZIndex = $state(10);
+
   // Get scale from stampSize slider (10-100 → 0.15-0.8)
   let stampScale = $derived(0.15 + ($stampSize / 100) * 0.65);
 
@@ -239,6 +245,7 @@
           y: Math.max(5, Math.min(95, py)),
           scale: stampScale,
           rotation: 0,
+          zIndex: ++nextZIndex,
           side: $shirtSide,
         },
       ]);
@@ -246,6 +253,7 @@
     }
     selected = false;
     selectedStampId = null;
+    contextMenu = null;
   }
 
   // --- Cursor tracking for stamp preview ---
@@ -285,6 +293,49 @@
     }
   }
 
+  function onDesignContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    contextMenu = { x: e.clientX, y: e.clientY, target: 'design' };
+  }
+
+  function onStampContextMenu(e: MouseEvent, stampId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    contextMenu = { x: e.clientX, y: e.clientY, target: 'stamp', stampId };
+  }
+
+  function bringToFront() {
+    if (!contextMenu) return;
+    nextZIndex++;
+    if (contextMenu.target === 'design') {
+      $designState.designZIndex = nextZIndex;
+    } else if (contextMenu.stampId) {
+      const id = contextMenu.stampId;
+      placedStamps.update((list) =>
+        list.map((s) => s.id === id ? { ...s, zIndex: nextZIndex } : s)
+      );
+    }
+    contextMenu = null;
+  }
+
+  function sendToBack() {
+    if (!contextMenu) return;
+    if (contextMenu.target === 'design') {
+      $designState.designZIndex = 0;
+    } else if (contextMenu.stampId) {
+      const id = contextMenu.stampId;
+      placedStamps.update((list) =>
+        list.map((s) => s.id === id ? { ...s, zIndex: 0 } : s)
+      );
+    }
+    contextMenu = null;
+  }
+
+  function closeContextMenu() {
+    contextMenu = null;
+  }
+
   $effect(() => {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -315,11 +366,12 @@
     class="design-overlay"
     class:selected
     class:dragging
-    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale})"
+    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale}); z-index: {$designState.designZIndex}"
     onpointerdown={onDesignPointerDown}
     onpointermove={onDesignPointerMove}
     onpointerup={onDesignPointerUp}
     onclick={(e) => e.stopPropagation()}
+    oncontextmenu={onDesignContextMenu}
   >
     {#if $designState.threeDEnabled}
       <div class="three-d-perspective" style="perspective: 800px;">
@@ -403,11 +455,12 @@
       class="stamp-overlay"
       class:stamp-selected={selectedStampId === stamp.id}
       class:stamp-dragging={draggingStampId === stamp.id}
-      style="left: {stamp.x}%; top: {stamp.y}%; transform: translate(-50%, -50%) scale({stamp.scale}) rotate({stamp.rotation}deg)"
+      style="left: {stamp.x}%; top: {stamp.y}%; transform: translate(-50%, -50%) scale({stamp.scale}) rotate({stamp.rotation}deg); z-index: {stamp.zIndex ?? 2}"
       onpointerdown={(e) => onStampPointerDown(e, stamp.id)}
       onpointermove={onStampPointerMove}
       onpointerup={onStampPointerUp}
       onclick={(e) => e.stopPropagation()}
+      oncontextmenu={(e) => onStampContextMenu(e, stamp.id)}
     >
       <img src={stamp.src} alt="stamp" class="stamp-img" draggable="false" />
 
@@ -463,6 +516,17 @@
       style="left: {cursorX}px; top: {cursorY}px; width: {cursorBaseWidth}px; transform: translate(-50%, -50%) scale({stampScale})"
     >
       <img src={activeAsset.src} alt="stamp preview" draggable="false" />
+    </div>
+  {/if}
+
+  <!-- Context menu -->
+  {#if contextMenu}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div class="context-backdrop" onclick={closeContextMenu} oncontextmenu={(e) => { e.preventDefault(); closeContextMenu(); }}></div>
+    <div class="context-menu" style="left: {contextMenu.x}px; top: {contextMenu.y}px;">
+      <button class="context-item" onclick={bringToFront}>Bring to Front</button>
+      <button class="context-item" onclick={sendToBack}>Send to Back</button>
     </div>
   {/if}
 </div>
@@ -646,5 +710,41 @@
 
   .rotate-handle:active {
     cursor: grabbing;
+  }
+
+  .context-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+  }
+
+  .context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 4px;
+    min-width: 140px;
+  }
+
+  .context-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    font-family: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+    letter-spacing: -0.43px;
+  }
+
+  .context-item:hover {
+    background: #F4F4F4;
   }
 </style>

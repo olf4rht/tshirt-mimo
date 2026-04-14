@@ -37,6 +37,7 @@ const defaultDesign = {
   rotateY: 0,
   rotateZ: 0,
   extrudeColor: '',
+  designZIndex: 1,
 };
 
 type DesignState = typeof defaultDesign;
@@ -107,6 +108,7 @@ export interface PlacedStamp {
   y: number;
   scale: number;
   rotation: number;
+  zIndex: number;
   side: 'front' | 'back';
 }
 
