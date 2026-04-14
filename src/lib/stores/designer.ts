@@ -29,6 +29,14 @@ const defaultDesign = {
   designY: 36,
   designScale: 0.12,
   designVisible: true,
+  // 3D
+  threeDEnabled: false,
+  extrudeDepth: 50,
+  inflateDepth: 0,
+  rotateX: 0,
+  rotateY: 0,
+  rotateZ: 0,
+  extrudeColor: '',
 };
 
 type DesignState = typeof defaultDesign;

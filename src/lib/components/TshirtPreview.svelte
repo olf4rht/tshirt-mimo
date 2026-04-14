@@ -315,13 +315,51 @@
     class="design-overlay"
     class:selected
     class:dragging
-    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale})"
+    style="left: {$designState.designX}%; top: {$designState.designY}%; transform: translate(-50%, -50%) scale({$designState.designScale}); {$designState.threeDEnabled ? 'perspective: 800px;' : ''}"
     onpointerdown={onDesignPointerDown}
     onpointermove={onDesignPointerMove}
     onpointerup={onDesignPointerUp}
     onclick={(e) => e.stopPropagation()}
   >
-    <DesignSvgRenderer filterId="preview" />
+    {#if $designState.threeDEnabled}
+      <div
+        class="three-d-wrapper"
+        style="transform: rotateX({$designState.rotateX}deg) rotateY({$designState.rotateY}deg) rotateZ({$designState.rotateZ}deg);"
+      >
+        <!-- Extrusion layers (behind the front face) -->
+        {#if $designState.extrudeDepth > 0}
+          {@const layers = Math.min($designState.extrudeDepth, 50)}
+          {@const step = $designState.extrudeDepth / layers}
+          {#each Array(layers) as _, i}
+            <div
+              class="extrude-layer"
+              style="transform: translateZ({-(i + 1) * step}px);"
+            >
+              <DesignSvgRenderer filterId="extrude{i}" extrudeColor={$designState.extrudeColor || ''} />
+            </div>
+          {/each}
+        {/if}
+        <!-- Inflate layers (in front, expanding outward) -->
+        {#if $designState.inflateDepth > 0}
+          {@const inflateLayers = Math.min($designState.inflateDepth, 30)}
+          {@const inflateStep = $designState.inflateDepth / inflateLayers}
+          {#each Array(inflateLayers) as _, i}
+            <div
+              class="extrude-layer"
+              style="transform: translateZ({(i + 1) * inflateStep}px);"
+            >
+              <DesignSvgRenderer filterId="inflate{i}" extrudeColor={$designState.extrudeColor || ''} />
+            </div>
+          {/each}
+        {/if}
+        <!-- Front face -->
+        <div class="front-face" style="transform: translateZ(0px);">
+          <DesignSvgRenderer filterId="preview" />
+        </div>
+      </div>
+    {:else}
+      <DesignSvgRenderer filterId="preview" />
+    {/if}
 
     {#if selected}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -471,6 +509,37 @@
   }
 
   .design-overlay :global(.font-svg) {
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .three-d-wrapper {
+    position: relative;
+    transform-style: preserve-3d;
+    width: 100%;
+  }
+
+  .extrude-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    backface-visibility: hidden;
+  }
+
+  .extrude-layer :global(.font-svg) {
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .front-face {
+    position: relative;
+    backface-visibility: hidden;
+  }
+
+  .front-face :global(.font-svg) {
     width: 100%;
     height: auto;
     pointer-events: none;

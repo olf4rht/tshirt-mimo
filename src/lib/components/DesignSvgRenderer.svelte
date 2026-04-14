@@ -5,9 +5,26 @@
 
   interface Props {
     filterId?: string;
+    extrudeColor?: string;
   }
 
-  let { filterId = '' }: Props = $props();
+  let { filterId = '', extrudeColor }: Props = $props();
+
+  function darken(hex: string, amount: number): string {
+    const h = hex.replace('#', '');
+    const r = Math.max(0, Math.round(parseInt(h.substring(0, 2), 16) * (1 - amount)));
+    const g = Math.max(0, Math.round(parseInt(h.substring(2, 4), 16) * (1 - amount)));
+    const b = Math.max(0, Math.round(parseInt(h.substring(4, 6), 16) * (1 - amount)));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  }
+
+  // Extrude layers pass extrudeColor (even as empty string); front face passes undefined
+  let isExtrudeLayer = $derived(extrudeColor !== undefined);
+  let layerFillColor = $derived(
+    isExtrudeLayer
+      ? (extrudeColor !== '' ? extrudeColor : darken($designState.textColor, 0.4))
+      : undefined
+  );
 
   let paths: string[] = $state([]);
   let viewBox: string = $state('0 0 100 20');
@@ -201,8 +218,8 @@
     {#each transformedPaths as d}
       <path
         {d}
-        fill={$designState.textColor}
-        stroke={$designState.fillWeight > 0 ? $designState.textColor : 'none'}
+        fill={layerFillColor ?? $designState.textColor}
+        stroke={$designState.fillWeight > 0 ? (layerFillColor ?? $designState.textColor) : 'none'}
         stroke-width={$designState.fillWeight}
         stroke-linejoin="round"
         stroke-linecap="round"

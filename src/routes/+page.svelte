@@ -5,6 +5,7 @@
   import FontPicker from '$lib/components/FontPicker.svelte';
   import TransformSliders from '$lib/components/TransformSliders.svelte';
   import StrokeControls from '$lib/components/StrokeControls.svelte';
+  import ThreeDControls from '$lib/components/ThreeDControls.svelte';
   import StampManager from '$lib/components/StampManager.svelte';
   import TshirtPreview from '$lib/components/TshirtPreview.svelte';
   import ExportButton from '$lib/components/ExportButton.svelte';
@@ -156,6 +157,7 @@
         </div>
 
         <StrokeControls />
+        <ThreeDControls />
       {:else if $activeTab === 'stamps'}
         <StampManager />
       {:else}
