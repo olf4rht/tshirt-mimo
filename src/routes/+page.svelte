@@ -239,8 +239,34 @@
       onpointermove={onPreviewPointerMove}
       onpointerup={onPreviewPointerUp}
     >
-      <div style="transform: translate({previewPanX}px, {previewPanY}px) scale({previewZoom}); pointer-events: none">
-        <DesignSvgRenderer filterId="minipreview" />
+      <div style="transform: translate({previewPanX}px, {previewPanY}px) scale({previewZoom}); pointer-events: none; {$designState.threeDEnabled ? 'perspective: 800px;' : ''}">
+        {#if $designState.threeDEnabled}
+          <div class="mini-3d-wrapper" style="transform: rotateX({$designState.rotateX}deg) rotateY({$designState.rotateY}deg) rotateZ({$designState.rotateZ}deg);">
+            {#if $designState.extrudeDepth > 0}
+              {@const layers = Math.min($designState.extrudeDepth, 30)}
+              {@const step = $designState.extrudeDepth / layers}
+              {#each Array(layers) as _, i}
+                <div class="mini-extrude-layer" style="transform: translateZ({-(i + 1) * step}px);">
+                  <DesignSvgRenderer filterId="miniextrude{i}" extrudeColor={$designState.extrudeColor || ''} />
+                </div>
+              {/each}
+            {/if}
+            {#if $designState.inflateDepth > 0}
+              {@const inflateLayers = Math.min($designState.inflateDepth, 20)}
+              {@const inflateStep = $designState.inflateDepth / inflateLayers}
+              {#each Array(inflateLayers) as _, i}
+                <div class="mini-extrude-layer" style="transform: translateZ({(i + 1) * inflateStep}px);">
+                  <DesignSvgRenderer filterId="miniinflate{i}" extrudeColor={$designState.extrudeColor || ''} />
+                </div>
+              {/each}
+            {/if}
+            <div style="position: relative; transform: translateZ(0px);">
+              <DesignSvgRenderer filterId="minipreview" />
+            </div>
+          </div>
+        {:else}
+          <DesignSvgRenderer filterId="minipreview" />
+        {/if}
       </div>
     </div>
   </div>
@@ -640,5 +666,24 @@
     width: 100%;
     height: auto;
     max-height: 100%;
+  }
+
+  .mini-3d-wrapper {
+    position: relative;
+    transform-style: preserve-3d;
+    width: 100%;
+  }
+
+  .mini-extrude-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    backface-visibility: hidden;
+  }
+
+  .mini-extrude-layer :global(.font-svg) {
+    width: 100%;
+    height: auto;
   }
 </style>
