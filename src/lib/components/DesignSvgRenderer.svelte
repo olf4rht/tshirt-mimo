@@ -164,8 +164,8 @@
     </filter>
   </defs>
 
-  <g filter={$designState.roughEdges > 0 ? `url(#${prefix}text-distress)` : undefined}>
-    {#if $designState.strokeWeight > 0}
+  <g filter={$designState.roughEdges > 0 && !isExtrudeLayer ? `url(#${prefix}text-distress)` : undefined}>
+    {#if $designState.strokeWeight > 0 && !isExtrudeLayer}
       <g opacity={$designState.strokeOpacity / 100}>
       {#if hasStrokePixelized}
         <!-- LAYER 1: Wide blurred stroke + halftone dots = dotted halo fading at edges -->
@@ -219,8 +219,8 @@
       <path
         {d}
         fill={layerFillColor ?? $designState.textColor}
-        stroke={$designState.fillWeight > 0 ? (layerFillColor ?? $designState.textColor) : 'none'}
-        stroke-width={$designState.fillWeight}
+        stroke={!isExtrudeLayer && $designState.fillWeight > 0 ? (layerFillColor ?? $designState.textColor) : 'none'}
+        stroke-width={isExtrudeLayer ? 0 : $designState.fillWeight}
         stroke-linejoin="round"
         stroke-linecap="round"
         paint-order="stroke fill"
